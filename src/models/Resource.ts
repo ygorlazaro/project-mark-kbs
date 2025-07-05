@@ -3,7 +3,7 @@ export interface IResource {
     topicId: string;
     url: string;
     description: string;
-    type: 'video' | 'article' | 'pdf';
+    type: "video" | "article" | "pdf";
     createdAt: Date;
     updatedAt: Date;
 }

@@ -2,6 +2,6 @@ export interface IUser {
     id: string;
     name: string;
     email: string;
-    role: 'Admin' | 'Editor' | 'Viewer';
+    role: "Admin" | "Editor" | "Viewer";
     createdAt: Date;
 }

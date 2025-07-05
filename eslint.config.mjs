@@ -34,5 +34,7 @@ export default defineConfig([{
 
     rules: {
         "@typescript-eslint/no-explicit-any": "off",
-    },
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
+    }
 }]);
