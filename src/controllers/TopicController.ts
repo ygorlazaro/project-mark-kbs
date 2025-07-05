@@ -7,12 +7,47 @@ export class TopicController {
         this.get = this.get.bind(this);
     }
 
+    /**
+     * @swagger
+     * /api/topic:
+     *   post:
+     *     summary: Create a new topic
+     *     tags: [Topics]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Topic'
+     *     responses:
+     *       201:
+     *         description: Topic created successfully
+     */
     public create (req: Request, res: Response) {
         const topic = this.service.createTopic(req.body);
         
         res.status(201).json(topic);
     };
 
+    /**
+     * @swagger
+     * /api/topic/{id}:
+     *   get:
+     *     summary: Get a topic by ID
+     *     tags: [Topics]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *         description: The topic ID
+     *     responses:
+     *       200:
+     *         description: The topic data
+     *       404:
+     *         description: Topic not found
+     */
     public get(req: Request, res: Response) {
         const topic = this.service.getTopic(req.params.id);
         

@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import topicRoutes from "./routes/topicRoutes";
 import userRoutes from "./routes/userRoutes";
+import { setupSwagger } from "./config/swagger";
 
 const PORT = process.env.PORT ?? 3000;
 
@@ -13,6 +14,8 @@ app.use(cors());
 
 app.use("/api/topic", topicRoutes);
 app.use("/api/user", userRoutes);
+
+setupSwagger(app);
 
 // app.use(errorHandler);
 
