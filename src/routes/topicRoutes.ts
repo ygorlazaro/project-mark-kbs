@@ -9,10 +9,10 @@ const topicRepository = new TopicRepository();
 const topicService = new TopicService(topicRepository);
 const controller = new TopicController(topicService);
 
+router.get("/", controller.list);
 router.post("/", controller.create);
 router.get("/:id", controller.get);
-// router.get('/:id/tree', (req, res) => res.send('Get topic tree'));
-// router.get('/:id/version/:version', (req, res) => res.send('Get topic version'));
-// router.get('/shortest-path', (req, res) => res.send('Get shortest path'));
+router.put("/:id", controller.put);
+router.delete("/:id", controller.delete);
 
 export default router;
