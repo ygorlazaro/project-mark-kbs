@@ -1,5 +1,5 @@
 import express from "express";
-import { TopicController } from "../controllers/TopenController";
+import { TopicController } from "../controllers/TopicController";
 import { TopicRepository } from "../repositories/TopicRepository";
 import { TopicService } from "../services/TopicService";
 
