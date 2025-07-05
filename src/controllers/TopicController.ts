@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { TopicService } from "../services/TopicService";
+import { TopicInput, TopicSchema } from "../models/Topic";
 
 export class TopicController {
     constructor(private service: TopicService) { 
@@ -24,8 +25,17 @@ export class TopicController {
      *         description: Topic created successfully
      */
     public create (req: Request, res: Response) {
-        const topic = this.service.createTopic(req.body);
-        
+        const parseResult = TopicSchema.safeParse(req.body);
+
+        if (!parseResult.success) {
+            res.status(400).json({ errors: parseResult.error.format() });
+
+            return;
+        }
+
+        const topicInput: TopicInput = parseResult.data;
+        const topic = this.service.createTopic(topicInput);
+
         res.status(201).json(topic);
     };
 

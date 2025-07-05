@@ -1,3 +1,5 @@
+import z from "zod";
+
 /**
  * @swagger
  * components:
@@ -33,3 +35,12 @@ export interface ITopic {
     version: number;
     parentTopicId?: string;
 }
+
+export const TopicSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    content: z.string().min(1, "Content is required"),
+    version: z.number().int(),
+    parentTopicId: z.string().optional(),
+});
+
+export type TopicInput = z.infer<typeof TopicSchema>;
