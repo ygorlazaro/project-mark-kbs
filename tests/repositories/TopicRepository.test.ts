@@ -47,7 +47,8 @@ describe("TopicRepository", () => {
         expect(updated).toBeDefined();
         expect(updated?.name).toBe("Updated Title");
         expect(updated?.version).toBe(sampleTopic.version + 1);
-        expect(updated?.id).toBe(sampleTopic.id);
+        expect(typeof updated?.id).toBe("string");
+        expect(updated?.id).not.toBe(sampleTopic.id);
         expect(updated?.createdAt).toBe(sampleTopic.createdAt);
         expect(updated?.updatedAt).not.toBe(sampleTopic.updatedAt);
     });

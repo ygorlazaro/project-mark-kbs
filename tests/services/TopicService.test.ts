@@ -59,74 +59,97 @@ describe("TopicService", () => {
     });
   });
 
-  describe("updateTopic", () => {
-    it("should update topic if parentTopicId exists", () => {
-      const id = "1";
-      const data = { name: "Updated Name", parentTopicId: "2" };
-      const parentTopic: ITopic = {
-        id: "2",
-        name: "Parent Topic",
-        content: "Parent Content",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        version: 1,
-        parentTopicId: undefined,
-      };
-      const updatedTopic: ITopic = {
-        id,
-        name: data.name!,
-        content: "Old Content",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        version: 2,
-        parentTopicId: data.parentTopicId,
-      };
+    describe("updateTopic", () => {
+        it("should create a new version of the topic if parentTopicId exists", () => {
+            const id = "1";
+            const data = { name: "Updated Name", parentTopicId: "2" };
+            const parentTopic: ITopic = {
+                id: "2",
+                name: "Parent Topic",
+                content: "Parent Content",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                version: 1,
+                parentTopicId: undefined,
+            };
+            const newVersionTopic: ITopic = {
+                id: "new-id",
+                name: data.name!,
+                content: "Old Content",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                version: 2,
+                parentTopicId: data.parentTopicId,
+            };
 
-      mockRepository.findById.mockImplementation((id) => (id === "2" ? parentTopic : undefined));
-      mockRepository.update.mockReturnValue(updatedTopic);
+            mockRepository.findById.mockImplementation((id) => (id === "2" ? parentTopic : undefined));
+            mockRepository.update.mockReturnValue(newVersionTopic);
 
-      const result = topicService.updateTopic(id, data);
+            const result = topicService.updateTopic(id, data);
 
-      expect(mockRepository.findById).toHaveBeenCalledWith("2");
-      expect(mockRepository.update).toHaveBeenCalledWith(id, data);
-      expect(result).toEqual(updatedTopic);
+            expect(mockRepository.findById).toHaveBeenCalledWith("2");
+            expect(mockRepository.update).toHaveBeenCalledWith(id, data);
+            expect(result).toEqual(newVersionTopic);
+        });
+
+        it("should return undefined if parentTopicId does not exist", () => {
+            const id = "1";
+            const data = { parentTopicId: "nonexistent" };
+
+            mockRepository.findById.mockReturnValue(undefined);
+
+            const result = topicService.updateTopic(id, data);
+
+            expect(mockRepository.findById).toHaveBeenCalledWith("nonexistent");
+            expect(result).toBeUndefined();
+            expect(mockRepository.update).not.toHaveBeenCalled();
+        });
+
+        it("should create a new version of the topic if parentTopicId is not provided", () => {
+            const id = "1";
+            const data = { name: "Updated Name" };
+            const newVersionTopic: ITopic = {
+                id: "new-id",
+                name: data.name!,
+                content: "Old Content",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                version: 2,
+                parentTopicId: undefined,
+            };
+
+            mockRepository.update.mockReturnValue(newVersionTopic);
+
+            const result = topicService.updateTopic(id, data);
+
+            expect(mockRepository.findById).not.toHaveBeenCalled();
+            expect(mockRepository.update).toHaveBeenCalledWith(id, data);
+            expect(result).toEqual(newVersionTopic);
+        });
     });
 
-    it("should return undefined if parentTopicId does not exist", () => {
-      const id = "1";
-      const data = { parentTopicId: "nonexistent" };
+    describe("getTopicVersion", () => {
+        it("should return a specific version of a topic", () => {
+            const parentTopicId = "1";
+            const version = 2;
+            const topicVersion: ITopic = {
+                id: "2",
+                name: "Topic Version 2",
+                content: "Content Version 2",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                version,
+                parentTopicId,
+            };
 
-      mockRepository.findById.mockReturnValue(undefined);
+            mockRepository.findByParentIdAndVersion.mockReturnValue(topicVersion);
 
-      const result = topicService.updateTopic(id, data);
+            const result = topicService.getTopicVersion(parentTopicId, version);
 
-      expect(mockRepository.findById).toHaveBeenCalledWith("nonexistent");
-      expect(result).toBeUndefined();
-      expect(mockRepository.update).not.toHaveBeenCalled();
+            expect(mockRepository.findByParentIdAndVersion).toHaveBeenCalledWith(parentTopicId, version);
+            expect(result).toEqual(topicVersion);
+        });
     });
-
-    it("should update topic if parentTopicId is not provided", () => {
-      const id = "1";
-      const data = { name: "Updated Name" };
-      const updatedTopic: ITopic = {
-        id,
-        name: data.name!,
-        content: "Old Content",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        version: 2,
-        parentTopicId: undefined,
-      };
-
-      mockRepository.update.mockReturnValue(updatedTopic);
-
-      const result = topicService.updateTopic(id, data);
-
-      expect(mockRepository.findById).not.toHaveBeenCalled();
-      expect(mockRepository.update).toHaveBeenCalledWith(id, data);
-      expect(result).toEqual(updatedTopic);
-    });
-  });
 
   describe("deleteTopic", () => {
     it("should delete topic by id using repository.delete", () => {

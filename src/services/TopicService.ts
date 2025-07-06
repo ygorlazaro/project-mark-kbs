@@ -32,6 +32,10 @@ export class TopicService {
         return this.repository.update(id, data);
     }
 
+    getTopicVersion(parentTopicId: string, version: number): ITopic | undefined {
+        return this.repository.findByParentIdAndVersion(parentTopicId, version);
+    }
+
     deleteTopic(id: string): boolean {
         return this.repository.delete(id);
     }

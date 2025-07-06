@@ -1,4 +1,5 @@
 import { ITopic } from "../models/Topic";
+import { v4 as uuidv4 } from "uuid";
 
 export class TopicRepository {
     private topics: ITopic[] = [];
@@ -17,19 +18,23 @@ export class TopicRepository {
     }
 
     update(id: string, data: Partial<Omit<ITopic, "id" | "createdAt" | "updatedAt">>): ITopic | undefined {
-        const index = this.topics.findIndex(t => t.id === id);
-        if (index === -1) {
+        const existing = this.topics.find(t => t.id === id);
+        if (!existing) {
             return undefined;
         }
-        const existing = this.topics[index];
-        const updated: ITopic = {
-            ...existing,
-            ...data,
+        // Create a new version of the topic instead of updating in place
+        const newVersion = (existing.version || 0) + 1;
+        const newTopic: ITopic = {
+            id: uuidv4(),
+            name: data.name ?? existing.name,
+            content: data.content ?? existing.content,
+            createdAt: existing.createdAt,
             updatedAt: new Date(),
-            version: (existing.version || 0) + 1,
+            version: newVersion,
+            parentTopicId: data.parentTopicId ?? existing.parentTopicId,
         };
-        this.topics[index] = updated;
-        return updated;
+        this.topics.push(newTopic);
+        return newTopic;
     }
 
     delete(id: string): boolean {
@@ -39,5 +44,9 @@ export class TopicRepository {
         }
         this.topics.splice(index, 1);
         return true;
+    }
+
+    findByParentIdAndVersion(parentTopicId: string, version: number): ITopic | undefined {
+        return this.topics.find(t => t.parentTopicId === parentTopicId && t.version === version);
     }
 }
