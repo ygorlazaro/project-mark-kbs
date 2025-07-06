@@ -18,6 +18,7 @@ describe("TopicController", () => {
     service = {
       createTopic: jest.fn(),
       getTopic: jest.fn(),
+      getTopicTree: jest.fn(),
       updateTopic: jest.fn(),
       deleteTopic: jest.fn(),
       getAllTopics: jest.fn(),
@@ -52,20 +53,40 @@ describe("TopicController", () => {
     it("returns 404 if not found", () => {
       const { req, res, status, json } = mockReqRes();
       req.params = { id: "x" };
-      service.getTopic.mockReturnValue(undefined);
+      service.getTopicTree.mockReturnValue(undefined);
       controller.get(req, res);
-      expect(service.getTopic).toHaveBeenCalledWith("x");
+      expect(service.getTopicTree).toHaveBeenCalledWith("x");
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Topic not found" });
     });
 
-    it("returns topic if found", () => {
+    it("returns topic tree if found", () => {
       const { req, res, status, json } = mockReqRes();
-      const topic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const topicTree = {
+        id: "1",
+        name: "A",
+        content: "B",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: 1,
+        parentTopicId: undefined,
+        subtopics: [
+          {
+            id: "2",
+            name: "Subtopic",
+            content: "Subcontent",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            version: 1,
+            parentTopicId: "1",
+            subtopics: []
+          }
+        ]
+      };
       req.params = { id: "1" };
-      service.getTopic.mockReturnValue(topic);
+      service.getTopicTree.mockReturnValue(topicTree);
       controller.get(req, res);
-      expect(json).toHaveBeenCalledWith(topic);
+      expect(json).toHaveBeenCalledWith(topicTree);
       expect(status).not.toHaveBeenCalledWith(404);
     });
   });

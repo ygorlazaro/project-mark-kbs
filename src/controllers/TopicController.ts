@@ -93,15 +93,14 @@ export class TopicController {
      *         description: Topic not found
      */
     public get(req: Request, res: Response) {
-        const topic = this.service.getTopic(req.params.id);
+        const topicTree = this.service.getTopicTree(req.params.id);
         
-        if (!topic) {
+        if (!topicTree) {
             res.status(404).json({ message: "Topic not found" });
-
             return;
         }
 
-        res.json(topic);
+        res.json(topicTree);
     };
 
     /**

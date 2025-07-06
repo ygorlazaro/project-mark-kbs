@@ -43,4 +43,14 @@ export class TopicService {
     getAllTopics(): ITopic[] {
         return this.repository.findAll();
     }
+
+    getTopicTree(id: string): any | undefined {
+        const topic = this.repository.findById(id);
+        if (!topic) return undefined;
+        const buildTree = (node: ITopic): any => {
+            const children = this.repository.findByParentId(node.id).map(buildTree);
+            return { ...node, subtopics: children };
+        };
+        return buildTree(topic);
+    }
 }

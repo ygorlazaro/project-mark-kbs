@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 export class TopicRepository {
     private topics: ITopic[] = [];
 
+    findByParentId(parentTopicId: string): ITopic[] {
+        return this.topics.filter(t => t.parentTopicId === parentTopicId);
+    }
+
     create(topic: ITopic): ITopic {
         this.topics.push(topic);
         return topic;
