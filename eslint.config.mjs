@@ -36,5 +36,12 @@ export default defineConfig([{
         "@typescript-eslint/no-explicit-any": "off",
         "quotes": ["error", "double"],
         "semi": ["error", "always"],
+        "curly": ["error", "all"],
+        "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
+        "padding-line-between-statements": [
+            "error",
+            { "blankLine": "always", "prev": "*", "next": ["if", "for", "switch", "while"] },
+            { "blankLine": "always", "prev": ["if", "for", "switch"], "next": "*" }
+        ]
     }
 }]);

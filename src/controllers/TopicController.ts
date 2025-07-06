@@ -3,67 +3,43 @@ import { TopicService } from "../services/TopicService";
 import { TopicInput, TopicSchema } from "../models/Topic";
 
 export class TopicController {
-    constructor(private service: TopicService) { 
-        this.create = this.create.bind(this);
-        this.get = this.get.bind(this);
-        this.put = this.put.bind(this);
-        this.delete = this.delete.bind(this);
-        this.list = this.list.bind(this);
-    }
+    constructor(private service: TopicService) {}
 
-    /**
-     * @swagger
-     * /api/topic/{id}:
-     *   delete:
-     *     summary: Delete a topic by ID
-     *     tags: [Topics]
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         schema:
-     *           type: string
-     *         required: true
-     *         description: The topic ID
-     *     responses:
-     *       200:
-     *         description: Topic deleted successfully
-     *       404:
-     *         description: Topic not found
-     */
-    public delete(req: Request, res: Response) {
+    public findShortestPath = (req: Request, res: Response) => {
+        const from = req.query.from as string;
+        const to = req.query.to as string;
+
+        if (!from || !to) {
+            res.status(400).json({ message: "Missing 'from' or 'to' query parameter" });
+            return;
+        }
+
+        const path = this.service.findShortestPath(from, to);
+
+        if (!path) {
+            res.status(404).json({ message: "No path found between the given topics" });
+            return;
+        }
+
+        res.status(200).json(path);
+    };
+
+    public delete = (req: Request, res: Response) => {
         const deleted = this.service.deleteTopic(req.params.id);
 
         if (!deleted) {
             res.status(404).json({ message: "Topic not found" });
-
             return;
         }
 
         res.status(200).json({ message: "Topic deleted successfully" });
     };
 
-    /**
-     * @swagger
-     * /api/topic:
-     *   post:
-     *     summary: Create a new topic
-     *     tags: [Topics]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/Topic'
-     *     responses:
-     *       201:
-     *         description: Topic created successfully
-     */
-    public create (req: Request, res: Response) {
+    public create = (req: Request, res: Response) => {
         const parseResult = TopicSchema.safeParse(req.body);
 
         if (!parseResult.success) {
             res.status(400).json({ errors: parseResult.error.format() });
-
             return;
         }
 
@@ -73,26 +49,7 @@ export class TopicController {
         res.status(201).json(topic);
     };
 
-    /**
-     * @swagger
-     * /api/topic/{id}:
-     *   get:
-     *     summary: Get a topic by ID
-     *     tags: [Topics]
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         schema:
-     *           type: string
-     *         required: true
-     *         description: The topic ID
-     *     responses:
-     *       200:
-     *         description: The topic data
-     *       404:
-     *         description: Topic not found
-     */
-    public get(req: Request, res: Response) {
+    public get = (req: Request, res: Response) => {
         const topicTree = this.service.getTopicTree(req.params.id);
         
         if (!topicTree) {
@@ -103,55 +60,16 @@ export class TopicController {
         res.json(topicTree);
     };
 
-    /**
-     * @swagger
-     * /api/topic:
-     *   get:
-     *     summary: Get all topics
-     *     tags: [Topics]
-     *     responses:
-     *       200:
-     *         description: The topic data
-     */
-    public list(req: Request, res: Response) {
+    public list = (req: Request, res: Response) => {
         const topics = this.service.getAllTopics();
-
         res.json(topics);
     };
 
-    /**
-     * @swagger
-     * /api/topic/{id}:
-     *   put:
-     *     summary: Update a topic by ID
-     *     tags: [Topics]
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         schema:
-     *           type: string
-     *         required: true
-     *         description: The topic ID
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/Topic'
-     *     responses:
-     *       200:
-     *         description: Topic updated successfully
-     *       400:
-     *         description: Validation errors
-     *       404:
-     *         description: Topic not found
-     */
-    public put(req: Request, res: Response) {
+    public put = (req: Request, res: Response) => {
         const parseResult = TopicSchema.safeParse(req.body);
 
         if (!parseResult.success) {
             res.status(400).json({ errors: parseResult.error.format() });
-
             return;
         }
 
@@ -160,7 +78,6 @@ export class TopicController {
 
         if (!updatedTopic) {
             res.status(404).json({ message: "Topic not found" });
-
             return;
         }
 

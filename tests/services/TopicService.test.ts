@@ -192,4 +192,45 @@ describe("TopicService", () => {
       expect(result).toEqual(topics);
     });
   });
+
+  describe("findShortestPath", () => {
+    it("should return the direct path if from and to are the same", () => {
+      const topic: ITopic = {
+        id: "1",
+        name: "A",
+        content: "B",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: 1,
+        parentTopicId: undefined,
+      };
+      mockRepository.findAll.mockReturnValue([topic]);
+      mockRepository.findById.mockReturnValue(topic);
+      const result = topicService.findShortestPath("1", "1");
+      expect(result).toEqual([topic]);
+    });
+
+    it("should return the shortest path between two connected topics", () => {
+      const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" };
+      const t3: ITopic = { id: "3", name: "E", content: "F", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "2" };
+      mockRepository.findAll.mockReturnValue([t1, t2, t3]);
+      const result = topicService.findShortestPath("1", "3");
+      expect(result?.map(t => t.id)).toEqual(["1", "2", "3"]);
+    });
+
+    it("should return null if no path exists", () => {
+      const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      mockRepository.findAll.mockReturnValue([t1, t2]);
+      const result = topicService.findShortestPath("1", "2");
+      expect(result).toBeNull();
+    });
+
+    it("should return null if either topic does not exist", () => {
+      mockRepository.findAll.mockReturnValue([]);
+      const result = topicService.findShortestPath("x", "y");
+      expect(result).toBeNull();
+    });
+  });
 });

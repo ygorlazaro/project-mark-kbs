@@ -165,4 +165,36 @@ describe("TopicController", () => {
       expect(json).toHaveBeenCalledWith([]);
     });
   });
+
+  describe("findShortestPath", () => {
+    it("returns 400 if from or to is missing", () => {
+      const { req, res, status, json } = mockReqRes();
+      req.query = { from: "1" };
+      controller.findShortestPath(req, res);
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({ message: "Missing 'from' or 'to' query parameter" });
+    });
+
+    it("returns 404 if no path found", () => {
+      const { req, res, status, json } = mockReqRes();
+      req.query = { from: "1", to: "2" };
+      service.findShortestPath = jest.fn().mockReturnValue(null);
+      controller.findShortestPath(req, res);
+      expect(status).toHaveBeenCalledWith(404);
+      expect(json).toHaveBeenCalledWith({ message: "No path found between the given topics" });
+    });
+
+    it("returns 200 and the path if found", () => {
+      const { req, res, status, json } = mockReqRes();
+      req.query = { from: "1", to: "2" };
+      const path = [
+        { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined },
+        { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" }
+      ];
+      service.findShortestPath = jest.fn().mockReturnValue(path);
+      controller.findShortestPath(req, res);
+      expect(status).toHaveBeenCalledWith(200);
+      expect(json).toHaveBeenCalledWith(path);
+    });
+  });
 });

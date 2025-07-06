@@ -23,10 +23,11 @@ export class TopicRepository {
 
     update(id: string, data: Partial<Omit<ITopic, "id" | "createdAt" | "updatedAt">>): ITopic | undefined {
         const existing = this.topics.find(t => t.id === id);
+
         if (!existing) {
             return undefined;
         }
-        // Create a new version of the topic instead of updating in place
+
         const newVersion = (existing.version || 0) + 1;
         const newTopic: ITopic = {
             id: uuidv4(),
@@ -43,9 +44,11 @@ export class TopicRepository {
 
     delete(id: string): boolean {
         const index = this.topics.findIndex(t => t.id === id);
+
         if (index === -1) {
             return false;
         }
+
         this.topics.splice(index, 1);
         return true;
     }
