@@ -1,22 +1,13 @@
-import { ITopic } from "./topic";
+import { BaseService } from "../../abstracts/baseService";
+import { TopicModel } from "./topicModel";
 import { TopicRepository } from "./topicRepository";
 
-export class TopicService {
-    constructor(private repository: TopicRepository) { }
-
-    createTopic(data: { name: string; content: string; parentTopicId?: string }): ITopic {
-        return this.repository.create({
-            name: data.name,
-            content: data.content,
-            parentTopicId: data.parentTopicId,
-        });
+export class TopicService extends BaseService<TopicModel, TopicRepository> {
+    constructor(repository: TopicRepository) {
+        super(repository);
     }
 
-    getTopic(id: string): ITopic | undefined {
-        return this.repository.findById(id);
-    }
-
-    updateTopic(id: string, data: Partial<Omit<ITopic, "id" | "createdAt" | "updatedAt">>): ITopic | undefined {
+    update(id: string, data: Partial<TopicModel>): TopicModel | undefined {
         if (data.parentTopicId) {
             const parentExists = this.repository.findById(data.parentTopicId);
 
@@ -28,26 +19,18 @@ export class TopicService {
         return this.repository.update(id, data);
     }
 
-    getTopicVersion(parentTopicId: string, version: number): ITopic | undefined {
+    getTopicVersion(parentTopicId: string, version: number): TopicModel | undefined {
         return this.repository.findByParentIdAndVersion(parentTopicId, version);
     }
 
-    deleteTopic(id: string): boolean {
-        return this.repository.delete(id);
-    }
-
-    getAllTopics(): ITopic[] {
-        return this.repository.findAll();
-    }
-
-    getTopicTree(id: string): any | undefined {
+    getTopicTree(id: string): TopicModel & { subtopics: TopicModel[] } | undefined {
         const topic = this.repository.findById(id);
 
         if (!topic) {
             return undefined;
         }
 
-        const buildTree = (node: ITopic): any => {
+        const buildTree = (node: TopicModel): any => {
             const children = this.repository.findByParentId(node.id).map(buildTree);
 
             return { ...node, subtopics: children };
@@ -56,7 +39,7 @@ export class TopicService {
         return buildTree(topic);
     }
 
-    findShortestPath(fromId: string, toId: string): ITopic[] | null {
+    findShortestPath(fromId: string, toId: string): TopicModel[] | null {
         if (fromId === toId) {
             const topic = this.repository.findById(fromId);
 
@@ -64,7 +47,7 @@ export class TopicService {
         }
 
         const allTopics = this.repository.findAll();
-        const topicMap = new Map<string, ITopic>();
+        const topicMap = new Map<string, TopicModel>();
 
         for (const t of allTopics) {
             topicMap.set(t.id, t);

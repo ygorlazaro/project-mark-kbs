@@ -1,30 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
-import { UserInput, IUser } from "./user";
+import { UserModel } from "./userModel";
 import { UserDataStore } from "./userDataStore";
+import { BaseRepository } from "../../abstracts/baseRepository";
 
-export class UserRepository {
+export class UserRepository extends BaseRepository<UserModel> {
 
-  constructor(private userDate: UserDataStore) {
-    
-  }
-
-  create(user: UserInput): IUser {
-    const users =this.userDate.read();
-    const newUser: IUser = {
-      ...user,
-      id: uuidv4(),
-      createdAt: new Date(),
-    };
-
-    users.push(newUser);
-    this.userDate.write(users);
-
-    return newUser;
-  }
-
-  findById(id: string): IUser | undefined {
-    const users = this.userDate.read();
-
-    return users.find(u => u.id === id);
+  constructor(data: UserDataStore) {
+    super(data);
   }
 }

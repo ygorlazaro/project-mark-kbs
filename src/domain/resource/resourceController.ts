@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ResourceService } from "./resourceService";
-import { ResourceInput, ResourceSchema } from "./resource";
+import { ResourceModel, ResourceSchema } from "./resourceModel";
 
 export class ResourceController {
     constructor(private service: ResourceService) {}
@@ -14,14 +14,14 @@ export class ResourceController {
             return;
         }
 
-        const resourceInput: ResourceInput = parseResult.data;
-        const resource = this.service.createResource(resourceInput);
+        const resourceInput = parseResult.data as ResourceModel;
+        const resource = this.service.create(resourceInput);
 
         res.status(201).json(resource);
     };
 
-    public get = (req: Request, res: Response) => {
-        const resource = this.service.getResource(req.params.id);
+    public findById = (req: Request, res: Response) => {
+        const resource = this.service.findById(req.params.id);
 
         if (!resource) {
             res.status(404).json({ message: "Resource not found" });
@@ -32,13 +32,13 @@ export class ResourceController {
         res.json(resource);
     };
 
-    public list = (req: Request, res: Response) => {
-        const resources = this.service.getAllResources();
+    public findAll = (req: Request, res: Response) => {
+        const resources = this.service.findAll();
 
         res.json(resources);
     };
 
-    public put = (req: Request, res: Response) => {
+    public update = (req: Request, res: Response) => {
         const parseResult = ResourceSchema.safeParse(req.body);
 
         if (!parseResult.success) {
@@ -47,8 +47,8 @@ export class ResourceController {
             return;
         }
 
-        const resourceInput: ResourceInput = parseResult.data;
-        const updatedResource = this.service.updateResource(req.params.id, resourceInput);
+        const resourceInput = parseResult.data as ResourceModel;
+        const updatedResource = this.service.update(req.params.id, resourceInput);
 
         if (!updatedResource) {
             res.status(404).json({ message: "Resource not found" });
@@ -60,7 +60,7 @@ export class ResourceController {
     };
 
     public delete = (req: Request, res: Response) => {
-        const deleted = this.service.deleteResource(req.params.id);
+        const deleted = this.service.delete(req.params.id);
 
         if (!deleted) {
             res.status(404).json({ message: "Resource not found" });

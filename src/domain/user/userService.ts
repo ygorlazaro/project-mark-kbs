@@ -1,18 +1,10 @@
-import { UserInput, IUser } from "./user";
+import { BaseService } from "../../abstracts/baseService";
+import { UserModel } from "./userModel";
 import { UserRepository } from "./userRepository";
 
-export class UserService {
-  private repository: UserRepository;
+export class UserService extends BaseService<UserModel, UserRepository> {
 
   constructor(repository: UserRepository) {
-    this.repository = repository;
-  }
-
-  createUser(data: UserInput): IUser {
-    return this.repository.create(data);
-  }
-
-  getUserById(id: string): IUser | undefined {
-    return this.repository.findById(id);
+    super(repository);
   }
 }

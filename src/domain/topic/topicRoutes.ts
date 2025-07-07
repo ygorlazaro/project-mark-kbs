@@ -21,7 +21,7 @@ const controller = new TopicController(topicService);
  *       200:
  *         description: The topic data
  */
-router.get("/", controller.list);
+router.get("/", controller.findAll);
 /**
  * @swagger
  * /api/topic:
@@ -92,7 +92,7 @@ router.get("/shortest-path", controller.findShortestPath);
  *       404:
  *         description: Topic not found
  */
-router.get("/:id", controller.get);
+router.get("/:id", controller.findById);
 /**
  * @swagger
  * /api/topic/{id}:
@@ -120,7 +120,7 @@ router.get("/:id", controller.get);
  *       404:
  *         description: Topic not found
  */
-router.put("/:id", controller.put);
+router.put("/:id", controller.update);
 /**
  * @swagger
  * /api/topic/{id}:

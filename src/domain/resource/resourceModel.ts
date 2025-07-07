@@ -1,4 +1,5 @@
 import z from "zod";
+import { BaseModel } from "../../abstracts/baseModel";
 
 /**
  * @swagger
@@ -30,14 +31,11 @@ import z from "zod";
  *         - description
  *         - type
 */
-export interface IResource {
-    id: string;
-    topicId: string;
-    url: string;
-    description: string;
-    type: "video" | "article" | "pdf";
-    createdAt: Date;
-    updatedAt: Date;
+export class ResourceModel extends BaseModel {
+    topicId: string = "";
+    url: string = "";
+    description: string ="";
+    type: "video" | "article" | "pdf" = "article";
 }
 
 export const ResourceSchema = z.object({
@@ -47,4 +45,3 @@ export const ResourceSchema = z.object({
     type: z.enum(["video", "article", "pdf"])
 });
 
-export type ResourceInput = z.infer<typeof ResourceSchema>;

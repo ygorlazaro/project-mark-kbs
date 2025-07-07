@@ -34,7 +34,7 @@ const controller = new UserController(userService);
  *       400:
  *         description: Invalid input
  */
-router.post("/", controller.createUser);
+router.post("/", controller.create);
 
 /**
  * @openapi
@@ -59,6 +59,6 @@ router.post("/", controller.createUser);
  *       404:
  *         description: User not found
  */
-router.get("/:id", controller.getUserById);
+router.get("/:id", controller.findById);
 
 export default router;

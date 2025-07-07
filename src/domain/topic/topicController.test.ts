@@ -17,12 +17,12 @@ describe("TopicController", () => {
 
   beforeEach(() => {
     service = {
-      createTopic: jest.fn(),
+      create: jest.fn(),
       getTopic: jest.fn(),
       getTopicTree: jest.fn(),
-      updateTopic: jest.fn(),
-      deleteTopic: jest.fn(),
-      getAllTopics: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findAll: jest.fn(),
     } as unknown as jest.Mocked<TopicService>;
     controller = new TopicController(service);
     jest.clearAllMocks();
@@ -44,9 +44,9 @@ describe("TopicController", () => {
       const topic = { id: "1", ...input, createdAt: new Date(), updatedAt: new Date() };
 
       req.body = input;
-      service.createTopic.mockReturnValue(topic);
+      service.create.mockReturnValue(topic);
       controller.create(req, res);
-      expect(service.createTopic).toHaveBeenCalledWith(input);
+      expect(service.create).toHaveBeenCalledWith(input);
       expect(status).toHaveBeenCalledWith(201);
       expect(json).toHaveBeenCalledWith(topic);
     });
@@ -58,7 +58,7 @@ describe("TopicController", () => {
 
       req.params = { id: "x" };
       service.getTopicTree.mockReturnValue(undefined);
-      controller.get(req, res);
+      controller.findById(req, res);
       expect(service.getTopicTree).toHaveBeenCalledWith("x");
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Topic not found" });
@@ -90,7 +90,7 @@ describe("TopicController", () => {
 
       req.params = { id: "1" };
       service.getTopicTree.mockReturnValue(topicTree);
-      controller.get(req, res);
+      controller.findById(req, res);
       expect(json).toHaveBeenCalledWith(topicTree);
       expect(status).not.toHaveBeenCalledWith(404);
     });
@@ -102,7 +102,7 @@ describe("TopicController", () => {
 
       req.body = { bad: true };
       req.params = { id: "1" };
-      controller.put(req, res);
+      controller.update(req, res);
       expect(status).toHaveBeenCalledWith(400);
       expect(json).toHaveBeenCalledWith(expect.objectContaining({ errors: expect.any(Object) }));
     });
@@ -112,9 +112,9 @@ describe("TopicController", () => {
 
       req.body = { name: "N", content: "C", version: 2, parentTopicId: undefined };
       req.params = { id: "1" };
-      service.updateTopic.mockReturnValue(undefined);
-      controller.put(req, res);
-      expect(service.updateTopic).toHaveBeenCalledWith("1", req.body);
+      service.update.mockReturnValue(undefined);
+      controller.update(req, res);
+      expect(service.update).toHaveBeenCalledWith("1", req.body);
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Topic not found" });
     });
@@ -125,8 +125,8 @@ describe("TopicController", () => {
 
       req.body = { name: "N", content: "C", version: 2, parentTopicId: undefined };
       req.params = { id: "1" };
-      service.updateTopic.mockReturnValue(updated);
-      controller.put(req, res);
+      service.update.mockReturnValue(updated);
+      controller.update(req, res);
       expect(json).toHaveBeenCalledWith(updated);
       expect(status).not.toHaveBeenCalledWith(404);
     });
@@ -137,9 +137,9 @@ describe("TopicController", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "1" };
-      service.deleteTopic.mockReturnValue(false);
+      service.delete.mockReturnValue(false);
       controller.delete(req, res);
-      expect(service.deleteTopic).toHaveBeenCalledWith("1");
+      expect(service.delete).toHaveBeenCalledWith("1");
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Topic not found" });
     });
@@ -148,7 +148,7 @@ describe("TopicController", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "1" };
-      service.deleteTopic.mockReturnValue(true);
+      service.delete.mockReturnValue(true);
       controller.delete(req, res);
       expect(status).toHaveBeenCalledWith(200);
       expect(json).toHaveBeenCalledWith({ message: "Topic deleted successfully" });
@@ -163,17 +163,17 @@ describe("TopicController", () => {
         { id: "2", name: "C", content: "D", version: 1, createdAt: new Date(), updatedAt: new Date(), parentTopicId: "1" },
       ];
 
-      service.getAllTopics.mockReturnValue(topics);
-      controller.list(req, res);
-      expect(service.getAllTopics).toHaveBeenCalled();
+      service.findAll.mockReturnValue(topics);
+      controller.findAll(req, res);
+      expect(service.findAll).toHaveBeenCalled();
       expect(json).toHaveBeenCalledWith(topics);
     });
 
     it("returns empty array if no topics", () => {
       const { req, res, json } = mockReqRes();
 
-      service.getAllTopics.mockReturnValue([]);
-      controller.list(req, res);
+      service.findAll.mockReturnValue([]);
+      controller.findAll(req, res);
       expect(json).toHaveBeenCalledWith([]);
     });
   });

@@ -1,4 +1,5 @@
 import z from "zod";
+import { BaseModel } from "../../abstracts/baseModel";
 
 /** 
  *     User:
@@ -21,12 +22,10 @@ import z from "zod";
  *         - email
  *         - role
  */
-export interface IUser {
-    id: string;
-    name: string;
-    email: string;
-    role: "Admin" | "Editor" | "Viewer";
-    createdAt: Date;
+export class UserModel extends BaseModel {
+    name: string = "";
+    email: string = "";
+    role: "Admin" | "Editor" | "Viewer" = "Viewer";
 }
 
 export const UserSchema = z.object({
@@ -34,5 +33,3 @@ export const UserSchema = z.object({
     email: z.string().email("Invalid email format"),
     role: z.enum(["Admin", "Editor", "Viewer"])
 });
-
-export type UserInput = z.infer<typeof UserSchema>;

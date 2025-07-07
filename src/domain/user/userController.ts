@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { UserSchema } from "./user";
+import { UserModel, UserSchema } from "./userModel";
 import { UserService } from "./userService";
 
 export class UserController {
   constructor(private service: UserService) {
   }
 
-  createUser = (req: Request, res: Response)  => {
+  create = (req: Request, res: Response) => {
     const parse = UserSchema.safeParse(req.body);
 
     if (!parse.success) {
@@ -15,13 +15,13 @@ export class UserController {
       return;
     }
 
-    const user = this.service.createUser(parse.data);
+    const user = this.service.create(parse.data as UserModel);
 
     res.status(201).json(user);
   };
 
-  getUserById = (req: Request, res: Response) => {
-    const user = this.service.getUserById(req.params.id);
+  findById = (req: Request, res: Response) => {
+    const user = this.service.findById(req.params.id);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });

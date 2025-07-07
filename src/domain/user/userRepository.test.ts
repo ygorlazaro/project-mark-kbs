@@ -1,21 +1,22 @@
-import { UserInput, IUser } from "./user";
+import { UserModel } from "./userModel";
 import { UserDataStore } from "./userDataStore";
 import { UserRepository } from "./userRepository";
 
 describe("UserRepository", () => {
   let data: UserDataStore;
   let repo: UserRepository;
-  let sampleInput: UserInput;
-  let createdUser: IUser;
+  let sampleInput: UserModel;
+  let createdUser: UserModel;
 
   beforeEach(() => {
     data = new UserDataStore() as jest.Mocked<UserDataStore>;
     repo = new UserRepository(data);
-    sampleInput = {
-      name: "Test User",
-      email: "test@example.com",
-      role: "Admin"
-    };
+    sampleInput = new UserModel();
+
+    sampleInput.name = "Test User";
+    sampleInput.email = "test@example.com";
+    sampleInput.role = "Admin";
+
     createdUser = repo.create(sampleInput);
   });
 

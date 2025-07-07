@@ -1,6 +1,6 @@
 import { ResourceService } from "./resourceService";
 import { ResourceRepository } from "./resourceRepository";
-import { IResource, ResourceInput } from "./resource";
+import { ResourceModel } from "./resourceModel";
 import { ResourceDataStore } from "./resourceDataStore";
 
 jest.mock("../../src/repositories/ResourceRepository");
@@ -17,23 +17,23 @@ describe("ResourceService", () => {
     jest.clearAllMocks();
   });
 
-  describe("createResource", () => {
+  describe("create", () => {
     it("should create a resource and call repository.create", () => {
-      const input: ResourceInput = {
-        topicId: "t1",
-        url: "https://example.com",
-        description: "desc",
-        type: "video",
-      };
-      const createdResource: IResource = {
-        id: "uuid",
+      const input: ResourceModel = new ResourceModel();
+
+      input.topicId = "t1";
+      input.url = "https://example.com";
+      input.description = "desc";
+      input.type = "video";
+
+      const createdResource: ResourceModel = {
         ...input,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: input.createdAt,
+        updatedAt: input.updatedAt,
       };
 
       mockRepository.create.mockReturnValue(createdResource);
-      const result = resourceService.createResource(input);
+      const result = resourceService.create(input);
 
       expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining({
         topicId: input.topicId,
@@ -45,9 +45,9 @@ describe("ResourceService", () => {
     });
   });
 
-  describe("getResource", () => {
+  describe("findById", () => {
     it("should return resource by id using repository.findById", () => {
-      const resource: IResource = {
+      const resource: ResourceModel = {
         id: "1",
         topicId: "t1",
         url: "https://example.com",
@@ -58,18 +58,18 @@ describe("ResourceService", () => {
       };
 
       mockRepository.findById.mockReturnValue(resource);
-      const result = resourceService.getResource("1");
+      const result = resourceService.findById("1");
 
       expect(mockRepository.findById).toHaveBeenCalledWith("1");
       expect(result).toEqual(resource);
     });
   });
 
-  describe("updateResource", () => {
+  describe("update", () => {
     it("should update a resource", () => {
       const id = "1";
       const data = { description: "Updated" };
-      const updatedResource: IResource = {
+      const updatedResource: ResourceModel = {
         id: "1",
         topicId: "t1",
         url: "https://example.com",
@@ -80,26 +80,26 @@ describe("ResourceService", () => {
       };
 
       mockRepository.update.mockReturnValue(updatedResource);
-      const result = resourceService.updateResource(id, data);
+      const result = resourceService.update(id, data);
 
       expect(mockRepository.update).toHaveBeenCalledWith(id, data);
       expect(result).toEqual(updatedResource);
     });
   });
 
-  describe("deleteResource", () => {
+  describe("delete", () => {
     it("should delete resource by id using repository.delete", () => {
       mockRepository.delete.mockReturnValue(true);
-      const result = resourceService.deleteResource("1");
+      const result = resourceService.delete("1");
 
       expect(mockRepository.delete).toHaveBeenCalledWith("1");
       expect(result).toBe(true);
     });
   });
 
-  describe("getAllResources", () => {
+  describe("findAll", () => {
     it("should return all resources using repository.findAll", () => {
-      const resources: IResource[] = [
+      const resources: ResourceModel[] = [
         {
           id: "1",
           topicId: "t1",
@@ -121,16 +121,16 @@ describe("ResourceService", () => {
       ];
 
       mockRepository.findAll.mockReturnValue(resources);
-      const result = resourceService.getAllResources();
+      const result = resourceService.findAll();
 
       expect(mockRepository.findAll).toHaveBeenCalled();
       expect(result).toEqual(resources);
     });
   });
 
-  describe("getResourcesByTopicId", () => {
+  describe("findByIdsByTopicId", () => {
     it("should return resources for a topic", () => {
-      const resources: IResource[] = [
+      const resources: ResourceModel[] = [
         {
           id: "1",
           topicId: "t1",

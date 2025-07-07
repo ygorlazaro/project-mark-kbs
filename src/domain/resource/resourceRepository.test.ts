@@ -1,11 +1,11 @@
 import { ResourceRepository } from "./resourceRepository";
-import { IResource } from "./resource";
+import { ResourceModel } from "./resourceModel";
 import { ResourceDataStore } from "./resourceDataStore";
 
 describe("ResourceRepository", () => {
   let data: jest.Mocked<ResourceDataStore>;
   let repo: ResourceRepository;
-  let sampleResource: IResource;
+  let sampleResource: ResourceModel;
 
   beforeEach(() => {
     data = new ResourceDataStore() as jest.Mocked<ResourceDataStore>;
@@ -82,7 +82,7 @@ describe("ResourceRepository", () => {
 
   test("findByTopicId() should return resources for a topic", () => {
     repo.create(sampleResource);
-    const another: IResource = { ...sampleResource, id: "2", topicId: "t2" };
+    const another: ResourceModel = { ...sampleResource, id: "2", topicId: "t2" };
 
     repo.create(another);
     const found = repo.findByTopicId("t1");

@@ -1,87 +1,41 @@
-import { v4 as uuidv4 } from "uuid";
-import { ITopic } from "./topic";
+import { TopicModel } from "./topicModel";
 import { TopicDataStore } from "./topicDataStore";
+import { BaseRepository } from "../../abstracts/baseRepository";
 
-export class TopicRepository {
+export class TopicRepository extends BaseRepository<TopicModel> {
 
-    constructor(private data: TopicDataStore) {
-        
+    constructor(data: TopicDataStore) {
+        super(data);
     }
 
-    findByParentId(parentTopicId: string): ITopic[] {
+    findByParentId(parentTopicId: string): TopicModel[] {
         const topics = this.data.read();
 
         return topics.filter(t => t.parentTopicId === parentTopicId);
     }
 
-    create(data: { name: string; content: string; parentTopicId?: string }): ITopic {
-        const topics = this.data.read();
-        const newTopic: ITopic = {
-            id: uuidv4(),
-            name: data.name,
-            content: data.content,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            version: 1,
-            parentTopicId: data.parentTopicId,
-        };
+    create(topic: TopicModel): TopicModel {
+        if (topic.version !== 1) {
+            topic.version = 1;
+        }
 
-        topics.push(newTopic);
-        this.data.write(topics);
-
-        return newTopic;
+        return super.create(topic);
     }
 
-    findById(id: string): ITopic | undefined {
-        const topics = this.data.read();
-
-        return topics.find(t => t.id === id);
-    }
-
-    findAll(): ITopic[] {
-        return this.data.read();
-    }
-
-    update(id: string, data: Partial<Omit<ITopic, "id" | "createdAt" | "updatedAt">>): ITopic | undefined {
-        const topics = this.data.read();
-        const existing = topics.find(t => t.id === id);
+    update(id: string, data: Partial<TopicModel>): TopicModel | undefined {
+        const existing = super.findById(id);
 
         if (!existing) {
             return undefined;
         }
 
-        const newVersion = (existing.version || 0) + 1;
-        const newTopic: ITopic = {
-            id: uuidv4(),
-            name: data.name ?? existing.name,
-            content: data.content ?? existing.content,
-            createdAt: existing.createdAt,
-            updatedAt: new Date(),
-            version: newVersion,
-            parentTopicId: data.parentTopicId ?? existing.parentTopicId,
-        };
+        data.version = (existing.version || 0) + 1;
+        data.parentTopicId = data.parentTopicId ?? existing.parentTopicId;
 
-        topics.push(newTopic);
-        this.data.write(topics);
-
-        return newTopic;
+        return super.update(id, data);
     }
 
-    delete(id: string): boolean {
-        const topics = this.data.read();
-        const index = topics.findIndex(t => t.id === id);
-
-        if (index === -1) {
-            return false;
-        }
-
-        topics.splice(index, 1);
-        this.data.write(topics);
-
-        return true;
-    }
-
-    findByParentIdAndVersion(parentTopicId: string, version: number): ITopic | undefined {
+    findByParentIdAndVersion(parentTopicId: string, version: number): TopicModel | undefined {
         const topics = this.data.read();
 
         return topics.find(t => t.parentTopicId === parentTopicId && t.version === version);

@@ -1,11 +1,11 @@
-import { ITopic } from "./topic";
+import { TopicModel } from "./topicModel";
 import { TopicDataStore } from "./topicDataStore";
 import { TopicRepository } from "./topicRepository";
 
 describe("TopicRepository", () => {
     let data: jest.Mocked<TopicDataStore>;
     let repo: TopicRepository;
-    let sampleTopic: ITopic;
+    let sampleTopic: TopicModel;
 
     beforeEach(() => {
         data = new TopicDataStore() as jest.Mocked<TopicDataStore>;

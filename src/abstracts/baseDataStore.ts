@@ -1,7 +1,7 @@
 import fs from "fs";
 import { ensureDataFile } from "../utils/ensureDataFile";
 
-export abstract class AbstractDataStore<T> {
+export abstract class BaseDataStore<T> {
     protected abstract dataFolder: string;
     protected abstract filePath: string;
 

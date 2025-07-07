@@ -1,4 +1,4 @@
-import { ITopic } from "./topic";
+import { TopicModel } from "./topicModel";
 import { TopicDataStore } from "./topicDataStore";
 import { TopicRepository } from "./topicRepository";
 import { TopicService } from "./topicService";
@@ -17,22 +17,27 @@ describe("TopicService", () => {
     jest.clearAllMocks();
   });
 
-  describe("createTopic", () => {
+  describe("create", () => {
     it("should create a topic and call repository.create", () => {
-      const input = { name: "Test Topic", content: "Test Content", parentTopicId: undefined };
-      const createdTopic: ITopic = {
+      const input = new TopicModel();
+
+      input.name = "Test Topic";
+      input.content = "Test Content";
+      input.parentTopicId = undefined;
+
+      const createdTopic: TopicModel = {
         id: "uuid",
         name: input.name,
         content: input.content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: input.createdAt,
+        updatedAt: input.updatedAt,
         version: 1,
         parentTopicId: input.parentTopicId,
       };
 
       mockRepository.create.mockReturnValue(createdTopic);
 
-      const result = topicService.createTopic(input);
+      const result = topicService.create(input);
 
       expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining({
         name: input.name,
@@ -43,9 +48,9 @@ describe("TopicService", () => {
     });
   });
 
-  describe("getTopic", () => {
+  describe("findById", () => {
     it("should return topic by id using repository.findById", () => {
-      const topic: ITopic = {
+      const topic: TopicModel = {
         id: "1",
         name: "Topic 1",
         content: "Content 1",
@@ -57,18 +62,18 @@ describe("TopicService", () => {
 
       mockRepository.findById.mockReturnValue(topic);
 
-      const result = topicService.getTopic("1");
+      const result = topicService.findById("1");
 
       expect(mockRepository.findById).toHaveBeenCalledWith("1");
       expect(result).toEqual(topic);
     });
   });
 
-    describe("updateTopic", () => {
+  describe("update", () => {
         it("should create a new version of the topic if parentTopicId exists", () => {
             const id = "1";
-            const data = { name: "Updated Name", parentTopicId: "2" };
-            const parentTopic: ITopic = {
+          const data: Partial<TopicModel> = { name: "Updated Name", parentTopicId: "2" };
+          const parentTopic: TopicModel = {
                 id: "2",
                 name: "Parent Topic",
                 content: "Parent Content",
@@ -77,7 +82,7 @@ describe("TopicService", () => {
                 version: 1,
                 parentTopicId: undefined,
             };
-            const newVersionTopic: ITopic = {
+          const newVersionTopic: TopicModel = {
                 id: "new-id",
                 name: data.name!,
                 content: "Old Content",
@@ -90,7 +95,7 @@ describe("TopicService", () => {
             mockRepository.findById.mockImplementation((id) => (id === "2" ? parentTopic : undefined));
             mockRepository.update.mockReturnValue(newVersionTopic);
 
-            const result = topicService.updateTopic(id, data);
+          const result = topicService.update(id, data);
 
             expect(mockRepository.findById).toHaveBeenCalledWith("2");
             expect(mockRepository.update).toHaveBeenCalledWith(id, data);
@@ -103,7 +108,7 @@ describe("TopicService", () => {
 
             mockRepository.findById.mockReturnValue(undefined);
 
-            const result = topicService.updateTopic(id, data);
+          const result = topicService.update(id, data);
 
             expect(mockRepository.findById).toHaveBeenCalledWith("nonexistent");
             expect(result).toBeUndefined();
@@ -113,7 +118,7 @@ describe("TopicService", () => {
         it("should create a new version of the topic if parentTopicId is not provided", () => {
             const id = "1";
             const data = { name: "Updated Name" };
-            const newVersionTopic: ITopic = {
+          const newVersionTopic: TopicModel = {
                 id: "new-id",
                 name: data.name!,
                 content: "Old Content",
@@ -125,7 +130,7 @@ describe("TopicService", () => {
 
             mockRepository.update.mockReturnValue(newVersionTopic);
 
-            const result = topicService.updateTopic(id, data);
+          const result = topicService.update(id, data);
 
             expect(mockRepository.findById).not.toHaveBeenCalled();
             expect(mockRepository.update).toHaveBeenCalledWith(id, data);
@@ -133,11 +138,11 @@ describe("TopicService", () => {
         });
     });
 
-    describe("getTopicVersion", () => {
+  describe("getTopicVersion", () => {
         it("should return a specific version of a topic", () => {
             const parentTopicId = "1";
             const version = 2;
-            const topicVersion: ITopic = {
+          const topicVersion: TopicModel = {
                 id: "2",
                 name: "Topic Version 2",
                 content: "Content Version 2",
@@ -149,18 +154,18 @@ describe("TopicService", () => {
 
             mockRepository.findByParentIdAndVersion.mockReturnValue(topicVersion);
 
-            const result = topicService.getTopicVersion(parentTopicId, version);
+          const result = topicService.getTopicVersion(parentTopicId, version);
 
             expect(mockRepository.findByParentIdAndVersion).toHaveBeenCalledWith(parentTopicId, version);
             expect(result).toEqual(topicVersion);
         });
     });
 
-  describe("deleteTopic", () => {
+  describe("delete", () => {
     it("should delete topic by id using repository.delete", () => {
       mockRepository.delete.mockReturnValue(true);
 
-      const result = topicService.deleteTopic("1");
+      const result = topicService.delete("1");
 
       expect(mockRepository.delete).toHaveBeenCalledWith("1");
       expect(result).toBe(true);
@@ -169,7 +174,7 @@ describe("TopicService", () => {
 
   describe("getAllTopics", () => {
     it("should return all topics using repository.findAll", () => {
-      const topics: ITopic[] = [
+      const topics: TopicModel[] = [
         {
           id: "1",
           name: "Topic 1",
@@ -192,7 +197,7 @@ describe("TopicService", () => {
 
       mockRepository.findAll.mockReturnValue(topics);
 
-      const result = topicService.getAllTopics();
+      const result = topicService.findAll();
 
       expect(mockRepository.findAll).toHaveBeenCalled();
       expect(result).toEqual(topics);
@@ -201,7 +206,7 @@ describe("TopicService", () => {
 
   describe("findShortestPath", () => {
     it("should return the direct path if from and to are the same", () => {
-      const topic: ITopic = {
+      const topic: TopicModel = {
         id: "1",
         name: "A",
         content: "B",
@@ -219,9 +224,9 @@ describe("TopicService", () => {
     });
 
     it("should return the shortest path between two connected topics", () => {
-      const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
-      const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" };
-      const t3: ITopic = { id: "3", name: "E", content: "F", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "2" };
+      const t1: TopicModel = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const t2: TopicModel = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" };
+      const t3: TopicModel = { id: "3", name: "E", content: "F", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "2" };
 
       mockRepository.findAll.mockReturnValue([t1, t2, t3]);
       const result = topicService.findShortestPath("1", "3");
@@ -230,8 +235,8 @@ describe("TopicService", () => {
     });
 
     it("should return null if no path exists", () => {
-      const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
-      const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const t1: TopicModel = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+      const t2: TopicModel = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
 
       mockRepository.findAll.mockReturnValue([t1, t2]);
       const result = topicService.findShortestPath("1", "2");

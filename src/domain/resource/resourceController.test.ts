@@ -17,12 +17,12 @@ describe("ResourceController", () => {
 
   beforeEach(() => {
     service = {
-      createResource: jest.fn(),
-      getResource: jest.fn(),
-      updateResource: jest.fn(),
-      deleteResource: jest.fn(),
-      getAllResources: jest.fn(),
-      getResourcesByTopicId: jest.fn(),
+      create: jest.fn(),
+      findById: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findAll: jest.fn(),
+      findByIdsByTopicId: jest.fn(),
     } as unknown as jest.Mocked<ResourceService>;
     controller = new ResourceController(service);
     jest.clearAllMocks();
@@ -44,9 +44,9 @@ describe("ResourceController", () => {
       const resource = { ...input, id: "1", createdAt: new Date(), updatedAt: new Date() };
 
       req.body = input;
-      service.createResource.mockReturnValue(resource);
+      service.create.mockReturnValue(resource);
       controller.create(req, res);
-      expect(service.createResource).toHaveBeenCalledWith(input);
+      expect(service.create).toHaveBeenCalledWith(input);
       expect(status).toHaveBeenCalledWith(201);
       expect(json).toHaveBeenCalledWith(resource);
     });
@@ -57,9 +57,9 @@ describe("ResourceController", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "x" };
-      service.getResource.mockReturnValue(undefined);
-      controller.get(req, res);
-      expect(service.getResource).toHaveBeenCalledWith("x");
+      service.findById.mockReturnValue(undefined);
+      controller.findById(req, res);
+      expect(service.findById).toHaveBeenCalledWith("x");
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Resource not found" });
     });
@@ -69,8 +69,8 @@ describe("ResourceController", () => {
       const resource = { id: "1", topicId: "t1", url: "https://a.com", description: "desc", type: "video" as const, createdAt: new Date(), updatedAt: new Date() };
 
       req.params = { id: "1" };
-      service.getResource.mockReturnValue(resource);
-      controller.get(req, res);
+      service.findById.mockReturnValue(resource);
+      controller.findById(req, res);
       expect(json).toHaveBeenCalledWith(resource);
       expect(status).not.toHaveBeenCalledWith(404);
     });
@@ -82,7 +82,7 @@ describe("ResourceController", () => {
 
       req.body = { bad: true };
       req.params = { id: "1" };
-      controller.put(req, res);
+      controller.update(req, res);
       expect(status).toHaveBeenCalledWith(400);
       expect(json).toHaveBeenCalledWith(expect.objectContaining({ errors: expect.any(Object) }));
     });
@@ -92,9 +92,9 @@ describe("ResourceController", () => {
 
       req.body = { topicId: "t1", url: "https://a.com", description: "desc", type: "video" as const };
       req.params = { id: "1" };
-      service.updateResource.mockReturnValue(undefined);
-      controller.put(req, res);
-      expect(service.updateResource).toHaveBeenCalledWith("1", req.body);
+      service.update.mockReturnValue(undefined);
+      controller.update(req, res);
+      expect(service.update).toHaveBeenCalledWith("1", req.body);
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Resource not found" });
     });
@@ -105,8 +105,8 @@ describe("ResourceController", () => {
 
       req.body = { topicId: "t1", url: "https://a.com", description: "desc", type: "video" as const };
       req.params = { id: "1" };
-      service.updateResource.mockReturnValue(updated);
-      controller.put(req, res);
+      service.update.mockReturnValue(updated);
+      controller.update(req, res);
       expect(json).toHaveBeenCalledWith(updated);
       expect(status).not.toHaveBeenCalledWith(404);
     });
@@ -117,9 +117,9 @@ describe("ResourceController", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "1" };
-      service.deleteResource.mockReturnValue(false);
+      service.delete.mockReturnValue(false);
       controller.delete(req, res);
-      expect(service.deleteResource).toHaveBeenCalledWith("1");
+      expect(service.delete).toHaveBeenCalledWith("1");
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ message: "Resource not found" });
     });
@@ -128,7 +128,7 @@ describe("ResourceController", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "1" };
-      service.deleteResource.mockReturnValue(true);
+      service.delete.mockReturnValue(true);
       controller.delete(req, res);
       expect(status).toHaveBeenCalledWith(200);
       expect(json).toHaveBeenCalledWith({ message: "Resource deleted successfully" });
@@ -143,9 +143,9 @@ describe("ResourceController", () => {
         { id: "2", topicId: "t2", url: "https://b.com", description: "desc2", type: "article" as const, createdAt: new Date(), updatedAt: new Date() },
       ];
 
-      service.getAllResources.mockReturnValue(resources);
-      controller.list(req, res);
-      expect(service.getAllResources).toHaveBeenCalled();
+      service.findAll.mockReturnValue(resources);
+      controller.findAll(req, res);
+      expect(service.findAll).toHaveBeenCalled();
       expect(json).toHaveBeenCalledWith(resources);
     });
   });

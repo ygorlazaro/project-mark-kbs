@@ -1,4 +1,5 @@
 import z from "zod";
+import { BaseModel } from "../../abstracts/baseModel";
 
 /**
  * @swagger
@@ -26,13 +27,10 @@ import z from "zod";
  *         - updatedAt
  *         - version
 */
-export interface ITopic {
-    id: string;
-    name: string;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
-    version: number;
+export class TopicModel extends BaseModel {
+    name: string = "";
+    content: string = "";
+    version: number = 1;
     parentTopicId?: string;
 }
 
@@ -42,5 +40,3 @@ export const TopicSchema = z.object({
     version: z.number().int(),
     parentTopicId: z.string().optional(),
 });
-
-export type TopicInput = z.infer<typeof TopicSchema>;

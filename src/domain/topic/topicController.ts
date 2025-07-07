@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TopicSchema, TopicInput } from "./topic";
+import { TopicModel, TopicSchema } from "./topicModel";
 import { TopicService } from "./topicService";
 
 export class TopicController {
@@ -27,7 +27,7 @@ export class TopicController {
     };
 
     public delete = (req: Request, res: Response) => {
-        const deleted = this.service.deleteTopic(req.params.id);
+        const deleted = this.service.delete(req.params.id);
 
         if (!deleted) {
             res.status(404).json({ message: "Topic not found" });
@@ -47,13 +47,13 @@ export class TopicController {
             return;
         }
 
-        const topicInput: TopicInput = parseResult.data;
-        const topic = this.service.createTopic(topicInput);
+        const topicInput = parseResult.data as TopicModel;
+        const topic = this.service.create(topicInput);
 
         res.status(201).json(topic);
     };
 
-    public get = (req: Request, res: Response) => {
+    public findById = (req: Request, res: Response) => {
         const topicTree = this.service.getTopicTree(req.params.id);
         
         if (!topicTree) {
@@ -65,13 +65,13 @@ export class TopicController {
         res.json(topicTree);
     };
 
-    public list = (req: Request, res: Response) => {
-        const topics = this.service.getAllTopics();
+    public findAll = (req: Request, res: Response) => {
+        const topics = this.service.findAll();
 
         res.json(topics);
     };
 
-    public put = (req: Request, res: Response) => {
+    public update = (req: Request, res: Response) => {
         const parseResult = TopicSchema.safeParse(req.body);
 
         if (!parseResult.success) {
@@ -80,8 +80,8 @@ export class TopicController {
             return;
         }
 
-        const topicInput: TopicInput = parseResult.data;
-        const updatedTopic = this.service.updateTopic(req.params.id, topicInput);
+        const topicInput = parseResult.data as TopicModel;
+        const updatedTopic = this.service.update(req.params.id, topicInput);
 
         if (!updatedTopic) {
             res.status(404).json({ message: "Topic not found" });

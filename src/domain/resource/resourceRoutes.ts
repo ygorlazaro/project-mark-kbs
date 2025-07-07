@@ -21,7 +21,7 @@ const controller = new ResourceController(resourceService);
  *       200:
  *         description: The resource data
  */
-router.get("/", controller.list);
+router.get("/", controller.findAll);
 /**
  * @swagger
  * /api/resource:
@@ -58,7 +58,7 @@ router.post("/", controller.create);
  *       404:
  *         description: Resource not found
  */
-router.get("/:id", controller.get);
+router.get("/:id", controller.findById);
 /**
  * @swagger
  * /api/resource/{id}:
@@ -86,7 +86,7 @@ router.get("/:id", controller.get);
  *       404:
  *         description: Resource not found
  */
-router.put("/:id", controller.put);
+router.put("/:id", controller.update);
 /**
  * @swagger
  * /api/resource/{id}:
