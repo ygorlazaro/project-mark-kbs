@@ -1,10 +1,11 @@
-import express from "express";
+import { Router } from "express";
 import { TopicController } from "./topicController";
 import { TopicRepository } from "./topicRepository";
 import { TopicService } from "./topicService";
 import { TopicDataStore } from "./topicDataStore";
+import { authMiddleware } from "../../middlewares/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 
 const dataTopic = new TopicDataStore();
 const topicRepository = new TopicRepository(dataTopic);
@@ -13,133 +14,146 @@ const controller = new TopicController(topicService);
 
 /**
  * @swagger
+ * tags:
+ *   name: Topics
+ *   description: Topic management
+ */
+
+/**
+ * @swagger
  * /api/topic:
  *   get:
  *     summary: Get all topics
  *     tags: [Topics]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: The topic data
+ *         description: Successful operation
  */
-router.get("/", controller.findAll);
-/**
- * @swagger
- * /api/topic:
- *   post:
- *     summary: Create a new topic
- *     tags: [Topics]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Topic'
- *     responses:
- *       201:
- *         description: Topic created successfully
- */
-router.post("/", controller.create);
+router.get("/", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findAll);
+
 /**
  * @swagger
  * /api/topic/shortest-path:
  *   get:
  *     summary: Find the shortest path between two topics
  *     tags: [Topics]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: from
+ *         name: startId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The starting topic ID
  *       - in: query
- *         name: to
+ *         name: endId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The target topic ID
  *     responses:
  *       200:
- *         description: Shortest path found
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Topic'
+ *         description: Successful operation
  *       400:
- *         description: Missing or invalid parameters
- *       404:
- *         description: No path found
+ *         description: Invalid input
  */
-router.get("/shortest-path", controller.findShortestPath);
+router.get("/shortest-path", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findShortestPath);
+
 /**
  * @swagger
  * /api/topic/{id}:
  *   get:
  *     summary: Get a topic by ID
  *     tags: [Topics]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The topic ID
  *     responses:
  *       200:
- *         description: The topic data
+ *         description: Successful operation
  *       404:
  *         description: Topic not found
  */
-router.get("/:id", controller.findById);
+router.get("/:id", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findById);
+
 /**
  * @swagger
- * /api/topic/{id}:
- *   put:
- *     summary: Update a topic by ID
+ * /api/topic:
+ *   post:
+ *     summary: Create a new topic
  *     tags: [Topics]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The topic ID
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Topic'
+ *             $ref: '#/components/schemas/TopicCreate'
+ *     responses:
+ *       201:
+ *         description: Topic created successfully
+ *       400:
+ *         description: Invalid input
+ */
+router.post("/", authMiddleware(["Admin", "Editor"]), controller.create);
+
+/**
+ * @swagger
+ * /api/topic/{id}:
+ *   put:
+ *     summary: Update a topic
+ *     tags: [Topics]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TopicUpdate'
  *     responses:
  *       200:
  *         description: Topic updated successfully
  *       400:
- *         description: Validation errors
+ *         description: Invalid input
  *       404:
  *         description: Topic not found
  */
-router.put("/:id", controller.update);
+router.put("/:id", authMiddleware(["Admin", "Editor"]), controller.update);
+
 /**
  * @swagger
  * /api/topic/{id}:
  *   delete:
- *     summary: Delete a topic by ID
+ *     summary: Delete a topic
  *     tags: [Topics]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The topic ID
  *     responses:
- *       200:
+ *       204:
  *         description: Topic deleted successfully
  *       404:
  *         description: Topic not found
  */
-router.delete("/:id", controller.delete);
+router.delete("/:id", authMiddleware(["Admin", "Editor"]), controller.delete);
 
 export default router;

@@ -1,10 +1,11 @@
-import express from "express";
+import { Router } from "express";
 import { ResourceController } from "./resourceController";
 import { ResourceRepository } from "./resourceRepository";
 import { ResourceService } from "./resourceService";
 import { ResourceDataStore } from "./resourceDataStore";
+import { authMiddleware } from "../../middlewares/authMiddleware";
 
-const router = express.Router();
+const router = Router();
 
 const dataResource = new ResourceDataStore();
 const resourceRepository = new ResourceRepository(dataResource);
@@ -13,117 +14,139 @@ const controller = new ResourceController(resourceService);
 
 /**
  * @swagger
+ * tags:
+ *   name: Resources
+ *   description: Resource management
+ */
+
+/**
+ * @swagger
  * /api/resource:
  *   get:
  *     summary: Get all resources
  *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: The resource data
+ *         description: Successful operation
  */
-router.get("/", controller.findAll);
+router.get("/", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findAll);
+
 /**
  * @swagger
- * /api/resource:
- *   post:
- *     summary: Create a new resource
+ * /api/resource/topic/{topicId}:
+ *   get:
+ *     summary: Get all resources for a specific topic
  *     tags: [Resources]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Resource'
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: topicId
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
- *       201:
- *         description: Resource created successfully
+ *       200:
+ *         description: Successful operation
  */
-router.post("/", controller.create);
+router.get("/topic/:topicId", authMiddleware(["Admin", "Editor", "Viewer"]), controller.listByTopic);
+
 /**
  * @swagger
  * /api/resource/{id}:
  *   get:
  *     summary: Get a resource by ID
  *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The resource ID
  *     responses:
  *       200:
- *         description: The resource data
+ *         description: Successful operation
  *       404:
  *         description: Resource not found
  */
-router.get("/:id", controller.findById);
+router.get("/:id", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findById);
+
 /**
  * @swagger
- * /api/resource/{id}:
- *   put:
- *     summary: Update a resource by ID
+ * /api/resource:
+ *   post:
+ *     summary: Create a new resource
  *     tags: [Resources]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The resource ID
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Resource'
+ *             $ref: '#/components/schemas/ResourceCreate'
+ *     responses:
+ *       201:
+ *         description: Resource created successfully
+ *       400:
+ *         description: Invalid input
+ */
+router.post("/", authMiddleware(["Admin", "Editor"]), controller.create);
+
+/**
+ * @swagger
+ * /api/resource/{id}:
+ *   put:
+ *     summary: Update a resource
+ *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResourceUpdate'
  *     responses:
  *       200:
  *         description: Resource updated successfully
  *       400:
- *         description: Validation errors
+ *         description: Invalid input
  *       404:
  *         description: Resource not found
  */
-router.put("/:id", controller.update);
+router.put("/:id", authMiddleware(["Admin", "Editor"]), controller.update);
+
 /**
  * @swagger
  * /api/resource/{id}:
  *   delete:
- *     summary: Delete a resource by ID
+ *     summary: Delete a resource
  *     tags: [Resources]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The resource ID
  *     responses:
- *       200:
+ *       204:
  *         description: Resource deleted successfully
  *       404:
  *         description: Resource not found
  */
-router.delete("/:id", controller.delete);
-/**
- * @swagger
- * /api/resource/topic/{topicId}:
- *   get:
- *     summary: Get all resources for a topic
- *     tags: [Resources]
- *     parameters:
- *       - in: path
- *         name: topicId
- *         schema:
- *           type: string
- *         required: true
- *         description: The topic ID
- *     responses:
- *       200:
- *         description: The resources for the topic
- */
-router.get("/topic/:topicId", controller.listByTopic);
+router.delete("/:id", authMiddleware(["Admin", "Editor"]), controller.delete);
 
 export default router;

@@ -1,10 +1,11 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import topicRoutes from "./domain/topic/topicRoutes";
 import userRoutes from "./domain/user/userRoutes";
+import resourceRoutes from "./domain/resource/resourceRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
-import { authenticateJWT } from "./middlewares/auth";
 import { setupSwagger } from "./config/swagger";
 
 const PORT = process.env.PORT ?? 3000;
@@ -14,23 +15,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-
-app.use("/api/topic", topicRoutes);
-app.use("/api/user", userRoutes);
-
+// Setup Swagger first
 setupSwagger(app);
 
-app.use((req, res, next) => {
-    if ((req.method === "GET" && req.path.startsWith("/swagger")) ||
-        (req.method === "POST" && req.path === "/api/user")) {
-        return next("route");
-    }
+// API routes
+app.use("/api/topic", topicRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/resource", resourceRoutes);
 
-    next();
-});
-
+// Error handler
 app.use(errorHandler);
-app.use(authenticateJWT);
-
 
 app.listen(PORT, () => console.log(`Running at ${PORT}`));

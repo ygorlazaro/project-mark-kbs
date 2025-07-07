@@ -1,88 +1,103 @@
 # Project Mark KBS
 
-A dynamic knowledge base API for managing interconnected topics and resources with version control.
+A dynamic and robust knowledge base system (KBS) API designed for managing users, topics, and resources efficiently. This project is built with a modern tech stack, including Node.js, Express, and TypeScript, ensuring type safety and scalability. It features a clean, domain-driven architecture to separate business logic and promote maintainability.
+
+## Features
+
+- **User Management**: Secure user registration and authentication using JSON Web Tokens (JWT).
+- **Topic Management**: Full CRUD (Create, Read, Update, Delete) operations for knowledge topics.
+- **Resource Management**: Full CRUD operations for resources, which can be linked to various topics.
+- **API Documentation**: Interactive API documentation powered by Swagger, available at the `/swagger` endpoint.
+- **Validation**: Robust request data validation using Zod.
+- **Code Quality**: Enforced code style and quality with ESLint and Husky git hooks.
 
 ## Technologies Used
 
-- **Node.js**
-- **TypeScript**
-- **Express**
-- **Swagger (swagger-jsdoc, swagger-ui-express)**
-- **Jest** (testing)
-- **ESLint** (linting)
-- **Husky** (git hooks)
-- **Zod** (validation)
-- **JWT** (authentication)
-- **UUID** (unique IDs)
-- **CORS**
-- **Body-Parser**
+- **Backend**: Node.js, Express, TypeScript
+- **Authentication**: JSON Web Token (jsonwebtoken)
+- **Validation**: Zod
+- **API Documentation**: Swagger (swagger-jsdoc, swagger-ui-express)
+- **Testing**: Jest, ts-jest
+- **Linting**: ESLint
+- **Dev Tools**: ts-node-dev, Husky
 
-## Project Structure
+## Prerequisites
 
-- `src/` - Source code (routes, controllers, models, config, middlewares)
-- `tests/` - Test files
-- `.env` - Environment variables
-- `package.json` - Project metadata and scripts
-- `tsconfig.json` - TypeScript configuration
-
-## Configuration
-
-1. Copy the `.env` file and set the required environment variables. Example:
-
-   ```sh
-   cp .env.example .env
-   # Edit .env as needed
-   ```
-
-2. Common variables:
-   - `PORT` (default: 3000)
-   - Any database or JWT secret keys as required by your implementation
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [NPM](https://www.npmjs.com/)
 
 ## Installation
 
-1. Install dependencies:
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   cd project-mark-kbs
+   ```
+
+2. Install dependencies:
    ```sh
    npm install
    ```
 
+## Configuration
+
+1. Create a `.env` file in the root directory. You can copy the `.env.example` if it exists:
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Add the necessary environment variables to your `.env` file:
+   ```
+   PORT=3000
+   JWT_SECRET=your_super_secret_key
+   ```
+
 ## Running the Project
 
-- **Development mode (with hot reload):**
+- **Development mode (with hot-reloading):**
   ```sh
   npm run dev
   ```
-- **Production build:**
+
+- **Production mode:**
   ```sh
   npm run build
   npm start
   ```
 
-## Testing
+The server will start on the port defined in your `.env` file (default: 3000).
 
-Run all tests using Jest:
-```sh
-npm test
+## API Documentation
+
+Once the server is running, you can access the interactive Swagger API documentation in your browser at:
+
+[http://localhost:3000/swagger](http://localhost:3000/swagger)
+
+## Testing and Linting
+
+- **Run all tests:**
+  ```sh
+  npm test
+  ```
+
+- **Lint and automatically fix issues:**
+  ```sh
+  npm run lint
+  ```
+
+## Project Structure
+
+The project follows a domain-driven structure to ensure separation of concerns:
+
 ```
-
-## Linting
-
-Automatically fix lint issues:
-```sh
-npm run lint
+src/
+├── abstracts/      # Abstract classes and interfaces
+├── app.ts          # Express app setup and main entry point
+├── config/         # Application configuration
+├── domain/         # Core business logic
+│   ├── resource/   # Resource entity, use-cases, controller, etc.
+│   ├── topic/      # Topic entity, use-cases, controller, etc.
+│   └── user/       # User entity, use-cases, controller, etc.
+├── middlewares/    # Custom Express middlewares (e.g., auth)
+└── utils/          # Utility functions
 ```
-
-## Accessing Swagger API Docs
-
-Once the server is running, open your browser and navigate to:
-
-```
-http://localhost:3000/swagger
-```
-
-This will display the interactive Swagger UI for exploring and testing the API endpoints.
-
-## Additional Notes
-
-- Husky is set up for git hooks to enforce code quality.
-- The project uses TypeScript for type safety and maintainability.
-- For any issues, check the logs or ensure your environment variables are set correctly.
