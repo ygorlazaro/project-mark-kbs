@@ -1,21 +1,15 @@
-import { ITopic } from "../models/Topic";
-import { TopicRepository } from "../repositories/TopicRepository";
-import {v4 as uuidv4} from "uuid";
+import { ITopic } from "./topic";
+import { TopicRepository } from "./topicRepository";
 
 export class TopicService {
     constructor(private repository: TopicRepository) { }
 
-    createTopic(data: Omit<ITopic, "id" | "createdAt" | "updatedAt" | "version">): ITopic {
-        const topic: ITopic = {
-            id: uuidv4(),
+    createTopic(data: { name: string; content: string; parentTopicId?: string }): ITopic {
+        return this.repository.create({
             name: data.name,
             content: data.content,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            version: 1,
             parentTopicId: data.parentTopicId,
-        };
-        return this.repository.create(topic);
+        });
     }
 
     getTopic(id: string): ITopic | undefined {
@@ -55,14 +49,17 @@ export class TopicService {
 
         const buildTree = (node: ITopic): any => {
             const children = this.repository.findByParentId(node.id).map(buildTree);
+
             return { ...node, subtopics: children };
         };
+
         return buildTree(topic);
     }
 
     findShortestPath(fromId: string, toId: string): ITopic[] | null {
         if (fromId === toId) {
             const topic = this.repository.findById(fromId);
+
             return topic ? [topic] : null;
         }
 
@@ -115,6 +112,7 @@ export class TopicService {
                 }
             }
         }
+
         return null;
     }
 }

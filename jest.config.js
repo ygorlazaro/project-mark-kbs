@@ -1,5 +1,7 @@
 module.exports = {
-    preset: "ts-jest",
     testEnvironment: "node",
-    testMatch: ["**/tests/**/*.test.ts"],
+    maxConcurrency: 20,
+    testMatch: ["**/src/**/*.test.ts"],
+    runner: "tsc",
+    workerThreads: true
 };

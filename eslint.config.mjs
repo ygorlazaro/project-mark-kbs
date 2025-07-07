@@ -40,6 +40,9 @@ export default defineConfig([{
         "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
         "padding-line-between-statements": [
             "error",
+            { "blankLine": "always", "prev": ["const", "let", "var"], "next": "*" },
+            { "blankLine": "any", "prev": ["const", "let", "var"], "next": ["const", "let", "var"] },
+            { "blankLine": "always", "prev": "*", "next": "return" },
             { "blankLine": "always", "prev": "*", "next": ["if", "for", "switch", "while"] },
             { "blankLine": "always", "prev": ["if", "for", "switch"], "next": "*" }
         ]

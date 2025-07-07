@@ -1,12 +1,13 @@
-import { TopicController } from "../../src/controllers/TopicController";
-import { TopicService } from "../../src/services/TopicService";
 import { Request, Response } from "express";
+import { TopicController } from "./topicController";
+import { TopicService } from "./topicService";
 
 function mockReqRes() {
   const json = jest.fn();
   const status = jest.fn(() => ({ json }));
   const res = { status, json } as unknown as Response;
   const req = { params: {}, body: {} } as unknown as Request;
+
   return { req, res, status, json };
 }
 
@@ -30,6 +31,7 @@ describe("TopicController", () => {
   describe("create", () => {
     it("returns 400 for invalid input", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.body = { invalid: true };
       controller.create(req, res);
       expect(status).toHaveBeenCalledWith(400);
@@ -40,6 +42,7 @@ describe("TopicController", () => {
       const { req, res, status, json } = mockReqRes();
       const input = { name: "Test", content: "Content", version: 1, parentTopicId: undefined };
       const topic = { id: "1", ...input, createdAt: new Date(), updatedAt: new Date() };
+
       req.body = input;
       service.createTopic.mockReturnValue(topic);
       controller.create(req, res);
@@ -52,6 +55,7 @@ describe("TopicController", () => {
   describe("get", () => {
     it("returns 404 if not found", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.params = { id: "x" };
       service.getTopicTree.mockReturnValue(undefined);
       controller.get(req, res);
@@ -83,6 +87,7 @@ describe("TopicController", () => {
           }
         ]
       };
+
       req.params = { id: "1" };
       service.getTopicTree.mockReturnValue(topicTree);
       controller.get(req, res);
@@ -94,6 +99,7 @@ describe("TopicController", () => {
   describe("put", () => {
     it("returns 400 for invalid input", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.body = { bad: true };
       req.params = { id: "1" };
       controller.put(req, res);
@@ -103,6 +109,7 @@ describe("TopicController", () => {
 
     it("returns 404 if update returns undefined", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.body = { name: "N", content: "C", version: 2, parentTopicId: undefined };
       req.params = { id: "1" };
       service.updateTopic.mockReturnValue(undefined);
@@ -115,6 +122,7 @@ describe("TopicController", () => {
     it("returns updated topic if successful", () => {
       const { req, res, status, json } = mockReqRes();
       const updated = { id: "1", name: "N", content: "C", version: 2, createdAt: new Date(), updatedAt: new Date(), parentTopicId: undefined };
+
       req.body = { name: "N", content: "C", version: 2, parentTopicId: undefined };
       req.params = { id: "1" };
       service.updateTopic.mockReturnValue(updated);
@@ -127,6 +135,7 @@ describe("TopicController", () => {
   describe("delete", () => {
     it("returns 404 if not found", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.params = { id: "1" };
       service.deleteTopic.mockReturnValue(false);
       controller.delete(req, res);
@@ -137,6 +146,7 @@ describe("TopicController", () => {
 
     it("returns 200 if deleted", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.params = { id: "1" };
       service.deleteTopic.mockReturnValue(true);
       controller.delete(req, res);
@@ -152,6 +162,7 @@ describe("TopicController", () => {
         { id: "1", name: "A", content: "B", version: 1, createdAt: new Date(), updatedAt: new Date(), parentTopicId: undefined },
         { id: "2", name: "C", content: "D", version: 1, createdAt: new Date(), updatedAt: new Date(), parentTopicId: "1" },
       ];
+
       service.getAllTopics.mockReturnValue(topics);
       controller.list(req, res);
       expect(service.getAllTopics).toHaveBeenCalled();
@@ -160,6 +171,7 @@ describe("TopicController", () => {
 
     it("returns empty array if no topics", () => {
       const { req, res, json } = mockReqRes();
+
       service.getAllTopics.mockReturnValue([]);
       controller.list(req, res);
       expect(json).toHaveBeenCalledWith([]);
@@ -169,6 +181,7 @@ describe("TopicController", () => {
   describe("findShortestPath", () => {
     it("returns 400 if from or to is missing", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.query = { from: "1" };
       controller.findShortestPath(req, res);
       expect(status).toHaveBeenCalledWith(400);
@@ -177,6 +190,7 @@ describe("TopicController", () => {
 
     it("returns 404 if no path found", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.query = { from: "1", to: "2" };
       service.findShortestPath = jest.fn().mockReturnValue(null);
       controller.findShortestPath(req, res);
@@ -186,11 +200,13 @@ describe("TopicController", () => {
 
     it("returns 200 and the path if found", () => {
       const { req, res, status, json } = mockReqRes();
+
       req.query = { from: "1", to: "2" };
       const path = [
         { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined },
         { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" }
       ];
+
       service.findShortestPath = jest.fn().mockReturnValue(path);
       controller.findShortestPath(req, res);
       expect(status).toHaveBeenCalledWith(200);

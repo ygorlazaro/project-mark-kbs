@@ -1,15 +1,18 @@
-import { TopicService } from "../../src/services/TopicService";
-import { TopicRepository } from "../../src/repositories/TopicRepository";
-import { ITopic } from "../../src/models/Topic";
+import { ITopic } from "./topic";
+import { TopicDataStore } from "./topicDataStore";
+import { TopicRepository } from "./topicRepository";
+import { TopicService } from "./topicService";
 
 jest.mock("../../src/repositories/TopicRepository");
 
 describe("TopicService", () => {
+  let data: jest.Mocked<TopicDataStore>;
   let topicService: TopicService;
   let mockRepository: jest.Mocked<TopicRepository>;
 
   beforeEach(() => {
-    mockRepository = new TopicRepository() as jest.Mocked<TopicRepository>;
+    data = new TopicDataStore() as jest.Mocked<TopicDataStore>;
+    mockRepository = new TopicRepository(data) as jest.Mocked<TopicRepository>;
     topicService = new TopicService(mockRepository);
     jest.clearAllMocks();
   });
@@ -26,6 +29,7 @@ describe("TopicService", () => {
         version: 1,
         parentTopicId: input.parentTopicId,
       };
+
       mockRepository.create.mockReturnValue(createdTopic);
 
       const result = topicService.createTopic(input);
@@ -50,6 +54,7 @@ describe("TopicService", () => {
         version: 1,
         parentTopicId: undefined,
       };
+
       mockRepository.findById.mockReturnValue(topic);
 
       const result = topicService.getTopic("1");
@@ -184,6 +189,7 @@ describe("TopicService", () => {
           parentTopicId: "1",
         },
       ];
+
       mockRepository.findAll.mockReturnValue(topics);
 
       const result = topicService.getAllTopics();
@@ -204,9 +210,11 @@ describe("TopicService", () => {
         version: 1,
         parentTopicId: undefined,
       };
+
       mockRepository.findAll.mockReturnValue([topic]);
       mockRepository.findById.mockReturnValue(topic);
       const result = topicService.findShortestPath("1", "1");
+
       expect(result).toEqual([topic]);
     });
 
@@ -214,22 +222,27 @@ describe("TopicService", () => {
       const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
       const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "1" };
       const t3: ITopic = { id: "3", name: "E", content: "F", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: "2" };
+
       mockRepository.findAll.mockReturnValue([t1, t2, t3]);
       const result = topicService.findShortestPath("1", "3");
+
       expect(result?.map(t => t.id)).toEqual(["1", "2", "3"]);
     });
 
     it("should return null if no path exists", () => {
       const t1: ITopic = { id: "1", name: "A", content: "B", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
       const t2: ITopic = { id: "2", name: "C", content: "D", createdAt: new Date(), updatedAt: new Date(), version: 1, parentTopicId: undefined };
+
       mockRepository.findAll.mockReturnValue([t1, t2]);
       const result = topicService.findShortestPath("1", "2");
+
       expect(result).toBeNull();
     });
 
     it("should return null if either topic does not exist", () => {
       mockRepository.findAll.mockReturnValue([]);
       const result = topicService.findShortestPath("x", "y");
+
       expect(result).toBeNull();
     });
   });

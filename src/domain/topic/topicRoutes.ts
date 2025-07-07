@@ -1,11 +1,13 @@
 import express from "express";
-import { TopicController } from "../controllers/TopicController";
-import { TopicRepository } from "../repositories/TopicRepository";
-import { TopicService } from "../services/TopicService";
+import { TopicController } from "./topicController";
+import { TopicRepository } from "./topicRepository";
+import { TopicService } from "./topicService";
+import { TopicDataStore } from "./topicDataStore";
 
 const router = express.Router();
 
-const topicRepository = new TopicRepository();
+const dataTopic = new TopicDataStore();
+const topicRepository = new TopicRepository(dataTopic);
 const topicService = new TopicService(topicRepository);
 const controller = new TopicController(topicService);
 

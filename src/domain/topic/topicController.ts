@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { TopicService } from "../services/TopicService";
-import { TopicInput, TopicSchema } from "../models/Topic";
+import { TopicSchema, TopicInput } from "./topic";
+import { TopicService } from "./topicService";
 
 export class TopicController {
     constructor(private service: TopicService) {}
@@ -11,6 +11,7 @@ export class TopicController {
 
         if (!from || !to) {
             res.status(400).json({ message: "Missing 'from' or 'to' query parameter" });
+
             return;
         }
 
@@ -18,6 +19,7 @@ export class TopicController {
 
         if (!path) {
             res.status(404).json({ message: "No path found between the given topics" });
+
             return;
         }
 
@@ -29,6 +31,7 @@ export class TopicController {
 
         if (!deleted) {
             res.status(404).json({ message: "Topic not found" });
+
             return;
         }
 
@@ -40,6 +43,7 @@ export class TopicController {
 
         if (!parseResult.success) {
             res.status(400).json({ errors: parseResult.error.format() });
+
             return;
         }
 
@@ -54,6 +58,7 @@ export class TopicController {
         
         if (!topicTree) {
             res.status(404).json({ message: "Topic not found" });
+
             return;
         }
 
@@ -62,6 +67,7 @@ export class TopicController {
 
     public list = (req: Request, res: Response) => {
         const topics = this.service.getAllTopics();
+
         res.json(topics);
     };
 
@@ -70,6 +76,7 @@ export class TopicController {
 
         if (!parseResult.success) {
             res.status(400).json({ errors: parseResult.error.format() });
+
             return;
         }
 
@@ -78,6 +85,7 @@ export class TopicController {
 
         if (!updatedTopic) {
             res.status(404).json({ message: "Topic not found" });
+
             return;
         }
 
