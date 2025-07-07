@@ -1,13 +1,16 @@
-import { v4 as uuidv4 } from "uuid";
-
 export class BaseModel {
-    id: string;
+    private static nextId: number = 1;
+    id: number;
     createdAt: Date;
     updatedAt: Date;
 
     constructor() {
-        this.id = uuidv4();
+        this.id = BaseModel.nextId++;
         this.createdAt = new Date();
         this.updatedAt = new Date();
+    }
+
+    static resetId() {
+        BaseModel.nextId = 1;
     }
 }

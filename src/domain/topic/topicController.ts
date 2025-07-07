@@ -5,17 +5,25 @@ import { TopicService } from "./topicService";
 export class TopicController {
     constructor(private service: TopicService) {}
 
-    public findShortestPath = (req: Request, res: Response) => {
-        const from = req.query.from as string;
-        const to = req.query.to as string;
+        public findShortestPath = (req: Request, res: Response) => {
+        const { startId, endId } = req.query;
 
-        if (!from || !to) {
-            res.status(400).json({ message: "Missing 'from' or 'to' query parameter" });
+        if (!startId || !endId) {
+            res.status(400).json({ message: "Missing 'startId' or 'endId' query parameter" });
 
             return;
         }
 
-        const path = this.service.findShortestPath(from, to);
+        const fromId = parseInt(startId as string, 10);
+        const toId = parseInt(endId as string, 10);
+
+        if (isNaN(fromId) || isNaN(toId)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const path = this.service.findShortestPath(fromId, toId);
 
         if (!path) {
             res.status(404).json({ message: "No path found between the given topics" });
@@ -26,8 +34,16 @@ export class TopicController {
         res.status(200).json(path);
     };
 
-    public delete = (req: Request, res: Response) => {
-        const deleted = this.service.delete(req.params.id);
+        public delete = (req: Request, res: Response) => {
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const deleted = this.service.delete(id);
 
         if (!deleted) {
             res.status(404).json({ message: "Topic not found" });
@@ -53,8 +69,16 @@ export class TopicController {
         res.status(201).json(topic);
     };
 
-    public findById = (req: Request, res: Response) => {
-        const topicTree = this.service.getTopicTree(req.params.id);
+        public findById = (req: Request, res: Response) => {
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const topicTree = this.service.getTopicTree(id);
         
         if (!topicTree) {
             res.status(404).json({ message: "Topic not found" });
@@ -71,8 +95,16 @@ export class TopicController {
         res.json(topics);
     };
 
-    public update = (req: Request, res: Response) => {
-        const parseResult = TopicSchema.safeParse(req.body);
+        public update = (req: Request, res: Response) => {
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const parseResult = TopicSchema.partial().safeParse(req.body);
 
         if (!parseResult.success) {
             res.status(400).json({ errors: parseResult.error.format() });
@@ -80,8 +112,8 @@ export class TopicController {
             return;
         }
 
-        const topicInput = parseResult.data as TopicModel;
-        const updatedTopic = this.service.update(req.params.id, topicInput);
+        const topicInput = parseResult.data as Partial<TopicModel>;
+        const updatedTopic = this.service.update(id, topicInput);
 
         if (!updatedTopic) {
             res.status(404).json({ message: "Topic not found" });

@@ -7,7 +7,7 @@ export class ResourceService extends BaseService<ResourceModel, ResourceReposito
         super(repository);
     }
 
-    getResourcesByTopicId(topicId: string): ResourceModel[] {
+    getResourcesByTopicId(topicId: number): ResourceModel[] {
         return this.repository.findByTopicId(topicId);
     }
 }

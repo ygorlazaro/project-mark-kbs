@@ -8,7 +8,7 @@ if (!process.env.JWT_SECRET) {
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export interface AuthPayload extends jose.JWTPayload {
-  userId: string;
+  userId: number;
   role: "Admin" | "Editor" | "Viewer";
   email: string;
   name: string;

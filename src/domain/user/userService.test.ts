@@ -3,7 +3,7 @@ import { UserDataStore } from "./userDataStore";
 import { UserRepository } from "./userRepository";
 import { UserService } from "./userService";
 
-jest.mock("../../src/repositories/UserRepository");
+jest.mock("./userRepository");
 
 describe("UserService", () => {
   let data: UserDataStore;
@@ -26,7 +26,7 @@ describe("UserService", () => {
       input.role = "Admin";
 
       const createdUser: UserModel = {
-        id: "uuid",
+        id: 1,
         name: input.name,
         email: input.email,
         role: input.role,
@@ -44,10 +44,10 @@ describe("UserService", () => {
   });
 
   describe("getUserById", () => {
-    it("should return user by id using repository.findById", () => {
+        it("should return user by id using repository.findById", () => {
       const user = new UserModel();
 
-      user.id = "1";
+      user.id = 1;
       user.name = "User 1";
       user.email = "user1@example.com";
       user.role = "Editor";
@@ -56,16 +56,17 @@ describe("UserService", () => {
 
       mockRepository.findById.mockReturnValue(user);
 
-      const result = userService.findById("1");
+      const result = userService.findById(1);
 
-      expect(mockRepository.findById).toHaveBeenCalledWith("1");
+      expect(mockRepository.findById).toHaveBeenCalledWith(1);
       expect(result).toEqual(user);
     });
 
-    it("should return undefined if user not found", () => {
+        it("should return undefined if user not found", () => {
       mockRepository.findById.mockReturnValue(undefined);
-      const result = userService.findById("nonexistent");
+      const result = userService.findById(999);
 
+      expect(mockRepository.findById).toHaveBeenCalledWith(999);
       expect(result).toBeUndefined();
     });
   });

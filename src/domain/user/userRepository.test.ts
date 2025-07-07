@@ -26,7 +26,7 @@ describe("UserRepository", () => {
       email: sampleInput.email,
       role: sampleInput.role
     });
-    expect(typeof createdUser.id).toBe("string");
+        expect(typeof createdUser.id).toBe("number");
     expect(createdUser.createdAt).toBeInstanceOf(Date);
   });
 
@@ -36,8 +36,8 @@ describe("UserRepository", () => {
     expect(found).toEqual(createdUser);
   });
 
-  test("findById() should return undefined if user not found", () => {
-    const found = repo.findById("nonexistent");
+    test("findById() should return undefined if user not found", () => {
+    const found = repo.findById(999);
 
     expect(found).toBeUndefined();
   });

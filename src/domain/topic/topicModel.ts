@@ -18,7 +18,7 @@ import { BaseModel } from "../../abstracts/baseModel";
  *           type: integer
  *           description: Version number of the topic
  *         parentTopicId:
- *           type: string
+ *           type: integer
  *           description: Optional ID of the parent topic for hierarchy
  *       required:
  *         - name
@@ -31,12 +31,12 @@ export class TopicModel extends BaseModel {
     name: string = "";
     content: string = "";
     version: number = 1;
-    parentTopicId?: string;
+        parentTopicId?: number;
 }
 
 export const TopicSchema = z.object({
     name: z.string().min(1, "Name is required"),
     content: z.string().min(1, "Content is required"),
     version: z.number().int(),
-    parentTopicId: z.string().optional(),
+        parentTopicId: z.number().int().optional(),
 });

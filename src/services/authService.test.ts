@@ -3,7 +3,7 @@ import { UserModel } from "../domain/user/userModel";
 
 describe("AuthService", () => {
   const user: UserModel = {
-    id: "1",
+    id: 1,
     name: "Test User",
     email: "test@example.com",
     role: "Admin",

@@ -19,10 +19,12 @@ describe("AuthMiddleware", () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
+    // Clear mocks before each test
+    jest.clearAllMocks();
   });
 
   it("should call next if token is valid and user has required role", async () => {
-    const user: UserModel = { id: "1", name: "Test", email: "test@test.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
+    const user: UserModel = { id: 1, name: "Test", email: "test@test.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
     const token = await signToken(user);
 
     mockRequest.headers = { authorization: `Bearer ${token}` };
@@ -38,7 +40,7 @@ describe("AuthMiddleware", () => {
   });
 
   it("should return 403 if user does not have required role", async () => {
-    const user: UserModel = { id: "1", name: "Test", email: "test@test.com", role: "Viewer", createdAt: new Date(), updatedAt: new Date() };
+    const user: UserModel = { id: 1, name: "Test", email: "test@test.com", role: "Viewer", createdAt: new Date(), updatedAt: new Date() };
     const token = await signToken(user);
 
     mockRequest.headers = { authorization: `Bearer ${token}` };
@@ -49,7 +51,7 @@ describe("AuthMiddleware", () => {
   });
 
   it("should return 403 if a non-admin tries to create a user", async () => {
-    const user: UserModel = { id: "1", name: "Test", email: "test@test.com", role: "Editor", createdAt: new Date(), updatedAt: new Date() };
+    const user: UserModel = { id: 1, name: "Test", email: "test@test.com", role: "Editor", createdAt: new Date(), updatedAt: new Date() };
     const token = await signToken(user);
 
     mockRequest.headers = { authorization: `Bearer ${token}` };
@@ -61,7 +63,7 @@ describe("AuthMiddleware", () => {
   });
 
   it("should return 403 if a viewer tries to perform a restricted action", async () => {
-    const user: UserModel = { id: "1", name: "Test", email: "test@test.com", role: "Viewer", createdAt: new Date(), updatedAt: new Date() };
+    const user: UserModel = { id: 1, name: "Test", email: "test@test.com", role: "Viewer", createdAt: new Date(), updatedAt: new Date() };
     const token = await signToken(user);
 
     mockRequest.headers = { authorization: `Bearer ${token}` };

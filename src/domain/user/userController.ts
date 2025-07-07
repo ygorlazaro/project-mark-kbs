@@ -47,7 +47,15 @@ export class UserController {
   };
 
   findById = (req: Request, res: Response) => {
-    const user = this.service.findById(req.params.id);
+    const id = parseInt(req.params.id, 10);
+
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid ID format" });
+
+      return;
+    }
+
+    const user = this.service.findById(id);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
@@ -59,7 +67,14 @@ export class UserController {
   };
 
   update = (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = parseInt(req.params.id, 10);
+
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid ID format" });
+
+      return;
+    }
+
     const parse = UserSchema.partial().safeParse(req.body);
 
     if (!parse.success) {
@@ -80,7 +95,14 @@ export class UserController {
   };
 
   delete = (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = parseInt(req.params.id, 10);
+
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid ID format" });
+
+      return;
+    }
+
     const success = this.service.delete(id);
 
     if (!success) {

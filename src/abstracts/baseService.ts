@@ -1,28 +1,28 @@
 import { BaseRepository } from "./baseRepository";
 import { BaseModel } from "./baseModel";
 
-export abstract class BaseService<TType extends BaseModel, TRepository extends BaseRepository<TType>>  {
+export abstract class BaseService<TModel extends BaseModel, TRepository extends BaseRepository<TModel>> {
     constructor(protected repository: TRepository) {
         
     }
 
-    public create(item: TType): TType {
+    public create(item: TModel): TModel {
         return this.repository.create(item);
     }
 
-    public findById(id: string): TType | undefined {
+    public findById(id: number): TModel | undefined {
         return this.repository.findById(id);
     }
 
-    public findAll(): TType[] {
+    public findAll(): TModel[] {
         return this.repository.findAll();
     }
 
-    public update(id: string, item: Partial<TType>): TType | undefined {
+    public update(id: number, item: Partial<TModel>): TModel | undefined {
         return this.repository.update(id, item);
     }
 
-    public delete(id: string): boolean {
+    public delete(id: number): boolean {
         return this.repository.delete(id);
     }
 }

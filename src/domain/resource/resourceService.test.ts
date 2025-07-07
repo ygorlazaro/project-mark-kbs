@@ -1,152 +1,149 @@
 import { ResourceService } from "./resourceService";
 import { ResourceRepository } from "./resourceRepository";
 import { ResourceModel } from "./resourceModel";
-import { ResourceDataStore } from "./resourceDataStore";
 
-jest.mock("../../src/repositories/ResourceRepository");
+jest.mock("./resourceRepository");
 
 describe("ResourceService", () => {
-  let resourceService: ResourceService;
-  let data: jest.Mocked<ResourceDataStore>;
-  let mockRepository: jest.Mocked<ResourceRepository>;
+    let resourceService: ResourceService;
+    let mockRepository: jest.Mocked<ResourceRepository>;
 
-  beforeEach(() => {
-    data = new ResourceDataStore() as jest.Mocked<ResourceDataStore>;
-    mockRepository = new ResourceRepository(data) as jest.Mocked<ResourceRepository>;
-    resourceService = new ResourceService(mockRepository);
-    jest.clearAllMocks();
-  });
-
-  describe("create", () => {
-    it("should create a resource and call repository.create", () => {
-      const input: ResourceModel = new ResourceModel();
-
-      input.topicId = "t1";
-      input.url = "https://example.com";
-      input.description = "desc";
-      input.type = "video";
-
-      const createdResource: ResourceModel = {
-        ...input,
-        createdAt: input.createdAt,
-        updatedAt: input.updatedAt,
-      };
-
-      mockRepository.create.mockReturnValue(createdResource);
-      const result = resourceService.create(input);
-
-      expect(mockRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-        topicId: input.topicId,
-        url: input.url,
-        description: input.description,
-        type: input.type,
-      }));
-      expect(result).toEqual(createdResource);
+    beforeEach(() => {
+        // Casting to jest.Mocked<ResourceRepository> is not strictly necessary
+        // because of the jest.mock call, but it provides type safety.
+        mockRepository = new (ResourceRepository as any)() as jest.Mocked<ResourceRepository>; 
+        resourceService = new ResourceService(mockRepository);
+        jest.clearAllMocks();
     });
-  });
 
-  describe("findById", () => {
-    it("should return resource by id using repository.findById", () => {
-      const resource: ResourceModel = {
-        id: "1",
-        topicId: "t1",
-        url: "https://example.com",
-        description: "desc",
-        type: "pdf",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    describe("create", () => {
+        it("should create a resource and call repository.create", () => {
+            const input: ResourceModel = {
+                topicId: 1,
+                url: "https://example.com",
+                description: "desc",
+                type: "video",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                id: 1,
+            };
 
-      mockRepository.findById.mockReturnValue(resource);
-      const result = resourceService.findById("1");
+            const createdResource: ResourceModel = {
+                ...input,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
 
-      expect(mockRepository.findById).toHaveBeenCalledWith("1");
-      expect(result).toEqual(resource);
+            mockRepository.create.mockReturnValue(createdResource);
+            const result = resourceService.create(input);
+
+            expect(mockRepository.create).toHaveBeenCalledWith(input);
+            expect(result).toEqual(createdResource);
+        });
     });
-  });
 
-  describe("update", () => {
-    it("should update a resource", () => {
-      const id = "1";
-      const data = { description: "Updated" };
-      const updatedResource: ResourceModel = {
-        id: "1",
-        topicId: "t1",
-        url: "https://example.com",
-        description: "Updated",
-        type: "article",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    describe("findById", () => {
+        it("should return resource by id using repository.findById", () => {
+            const resource: ResourceModel = {
+                id: 1,
+                topicId: 1,
+                url: "https://example.com",
+                description: "desc",
+                type: "pdf",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
 
-      mockRepository.update.mockReturnValue(updatedResource);
-      const result = resourceService.update(id, data);
+            mockRepository.findById.mockReturnValue(resource);
+            const result = resourceService.findById(1);
 
-      expect(mockRepository.update).toHaveBeenCalledWith(id, data);
-      expect(result).toEqual(updatedResource);
+            expect(mockRepository.findById).toHaveBeenCalledWith(1);
+            expect(result).toEqual(resource);
+        });
     });
-  });
 
-  describe("delete", () => {
-    it("should delete resource by id using repository.delete", () => {
-      mockRepository.delete.mockReturnValue(true);
-      const result = resourceService.delete("1");
+    describe("update", () => {
+        it("should update a resource", () => {
+            const id = 1;
+            const data = { description: "Updated" };
+            const updatedResource: ResourceModel = {
+                id: 1,
+                topicId: 1,
+                url: "https://example.com",
+                description: "Updated",
+                type: "article",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
 
-      expect(mockRepository.delete).toHaveBeenCalledWith("1");
-      expect(result).toBe(true);
+            mockRepository.update.mockReturnValue(updatedResource);
+            const result = resourceService.update(id, data);
+
+            expect(mockRepository.update).toHaveBeenCalledWith(id, data);
+            expect(result).toEqual(updatedResource);
+        });
     });
-  });
 
-  describe("findAll", () => {
-    it("should return all resources using repository.findAll", () => {
-      const resources: ResourceModel[] = [
-        {
-          id: "1",
-          topicId: "t1",
-          url: "https://example.com",
-          description: "desc",
-          type: "video",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "2",
-          topicId: "t2",
-          url: "https://example2.com",
-          description: "desc2",
-          type: "article",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+    describe("delete", () => {
+        it("should delete resource by id using repository.delete", () => {
+            mockRepository.delete.mockReturnValue(true);
+            const result = resourceService.delete(1);
 
-      mockRepository.findAll.mockReturnValue(resources);
-      const result = resourceService.findAll();
-
-      expect(mockRepository.findAll).toHaveBeenCalled();
-      expect(result).toEqual(resources);
+            expect(mockRepository.delete).toHaveBeenCalledWith(1);
+            expect(result).toBe(true);
+        });
     });
-  });
 
-  describe("findByIdsByTopicId", () => {
-    it("should return resources for a topic", () => {
-      const resources: ResourceModel[] = [
-        {
-          id: "1",
-          topicId: "t1",
-          url: "https://example.com",
-          description: "desc",
-          type: "video",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+    describe("findAll", () => {
+        it("should return all resources using repository.findAll", () => {
+            const resources: ResourceModel[] = [
+                {
+                    id: 1,
+                    topicId: 1,
+                    url: "https://example.com",
+                    description: "desc",
+                    type: "video",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    id: 2,
+                    topicId: 2,
+                    url: "https://example2.com",
+                    description: "desc2",
+                    type: "article",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ];
 
-      mockRepository.findByTopicId.mockReturnValue(resources);
-      const result = resourceService.getResourcesByTopicId("t1");
+            mockRepository.findAll.mockReturnValue(resources);
+            const result = resourceService.findAll();
 
-      expect(mockRepository.findByTopicId).toHaveBeenCalledWith("t1");
-      expect(result).toEqual(resources);
+            expect(mockRepository.findAll).toHaveBeenCalled();
+            expect(result).toEqual(resources);
+        });
     });
-  });
+
+    describe("getResourcesByTopicId", () => {
+        it("should return resources for a topic", () => {
+            const resources: ResourceModel[] = [
+                {
+                    id: 1,
+                    topicId: 1,
+                    url: "https://example.com",
+                    description: "desc",
+                    type: "video",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ];
+
+            mockRepository.findByTopicId.mockReturnValue(resources);
+            const result = resourceService.getResourcesByTopicId(1);
+
+            expect(mockRepository.findByTopicId).toHaveBeenCalledWith(1);
+            expect(result).toEqual(resources);
+        });
+    });
 });

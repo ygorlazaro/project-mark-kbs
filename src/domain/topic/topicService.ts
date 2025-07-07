@@ -7,7 +7,7 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         super(repository);
     }
 
-    update(id: string, data: Partial<TopicModel>): TopicModel | undefined {
+        update(id: number, data: Partial<TopicModel>): TopicModel | undefined {
         if (data.parentTopicId) {
             const parentExists = this.repository.findById(data.parentTopicId);
 
@@ -19,11 +19,11 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         return this.repository.update(id, data);
     }
 
-    getTopicVersion(parentTopicId: string, version: number): TopicModel | undefined {
+        getTopicVersion(parentTopicId: number, version: number): TopicModel | undefined {
         return this.repository.findByParentIdAndVersion(parentTopicId, version);
     }
 
-    getTopicTree(id: string): TopicModel & { subtopics: TopicModel[] } | undefined {
+        getTopicTree(id: number): TopicModel & { subtopics: TopicModel[] } | undefined {
         const topic = this.repository.findById(id);
 
         if (!topic) {
@@ -39,7 +39,7 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         return buildTree(topic);
     }
 
-    findShortestPath(fromId: string, toId: string): TopicModel[] | null {
+        findShortestPath(fromId: number, toId: number): TopicModel[] | null {
         if (fromId === toId) {
             const topic = this.repository.findById(fromId);
 
@@ -47,7 +47,7 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         }
 
         const allTopics = this.repository.findAll();
-        const topicMap = new Map<string, TopicModel>();
+                const topicMap = new Map<number, TopicModel>();
 
         for (const t of allTopics) {
             topicMap.set(t.id, t);
@@ -58,11 +58,11 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         }
 
         // Build adjacency list (bidirectional: parent <-> child)
-        const adj = new Map<string, Set<string>>();
+                const adj = new Map<number, Set<number>>();
 
         for (const t of allTopics) {
             if (!adj.has(t.id)) {
-                adj.set(t.id, new Set());
+                                adj.set(t.id, new Set());
             }
 
             if (t.parentTopicId) {
@@ -77,8 +77,8 @@ export class TopicService extends BaseService<TopicModel, TopicRepository> {
         }
 
         // BFS
-        const queue: string[][] = [[fromId]];
-        const visited = new Set<string>([fromId]);
+                const queue: number[][] = [[fromId]];
+        const visited = new Set<number>([fromId]);
 
         while (queue.length > 0) {
             const path = queue.shift()!;

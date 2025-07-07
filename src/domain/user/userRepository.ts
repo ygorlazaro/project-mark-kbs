@@ -13,4 +13,14 @@ export class UserRepository extends BaseRepository<UserModel> {
   constructor(data: UserDataStore) {
     super(data);
   }
+
+  public create(item: UserModel): UserModel {
+    const emailExists = this.findByEmail(item.email);
+
+    if (emailExists) {
+      throw new Error("Email already exists");
+    }
+
+    return super.create(item);
+  }
 }

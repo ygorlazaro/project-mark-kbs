@@ -21,7 +21,15 @@ export class ResourceController {
     };
 
     public findById = (req: Request, res: Response) => {
-        const resource = this.service.findById(req.params.id);
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const resource = this.service.findById(id);
 
         if (!resource) {
             res.status(404).json({ message: "Resource not found" });
@@ -29,16 +37,24 @@ export class ResourceController {
             return;
         }
 
-        res.json(resource);
+        res.status(200).json(resource);
     };
 
     public findAll = (req: Request, res: Response) => {
         const resources = this.service.findAll();
 
-        res.json(resources);
+        res.status(200).json(resources);
     };
 
     public update = (req: Request, res: Response) => {
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
         const parseResult = ResourceSchema.safeParse(req.body);
 
         if (!parseResult.success) {
@@ -48,7 +64,7 @@ export class ResourceController {
         }
 
         const resourceInput = parseResult.data as ResourceModel;
-        const updatedResource = this.service.update(req.params.id, resourceInput);
+        const updatedResource = this.service.update(id, resourceInput);
 
         if (!updatedResource) {
             res.status(404).json({ message: "Resource not found" });
@@ -56,11 +72,19 @@ export class ResourceController {
             return;
         }
 
-        res.json(updatedResource);
+        res.status(200).json(updatedResource);
     };
 
     public delete = (req: Request, res: Response) => {
-        const deleted = this.service.delete(req.params.id);
+        const id = parseInt(req.params.id, 10);
+
+        if (isNaN(id)) {
+            res.status(400).json({ message: "Invalid ID format" });
+
+            return;
+        }
+
+        const deleted = this.service.delete(id);
 
         if (!deleted) {
             res.status(404).json({ message: "Resource not found" });
@@ -72,8 +96,16 @@ export class ResourceController {
     };
 
     public listByTopic = (req: Request, res: Response) => {
-        const resources = this.service.getResourcesByTopicId(req.params.topicId);
+        const topicId = parseInt(req.params.topicId, 10);
 
-        res.json(resources);
+        if (isNaN(topicId)) {
+            res.status(400).json({ message: "Invalid topic ID format" });
+
+            return;
+        }
+
+        const resources = this.service.getResourcesByTopicId(topicId);
+
+        res.status(200).json(resources);
     };
 }

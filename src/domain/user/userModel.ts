@@ -1,22 +1,26 @@
 import z from "zod";
 import { BaseModel } from "../../abstracts/baseModel";
 
-/** 
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     User:
  *       type: object
  *       properties:
- *         id:
- *           type: string
  *         name:
  *           type: string
+ *           description: The user's name.
+ *           example: John Doe
  *         email:
  *           type: string
+ *           description: The user's email address.
+ *           example: john.doe@example.com
  *         role:
  *           type: string
  *           enum: [Admin, Editor, Viewer]
- *         createdAt:
- *           type: string
- *           format: date-time
+ *           description: The user's role.
+ *           example: Admin
  *       required:
  *         - name
  *         - email

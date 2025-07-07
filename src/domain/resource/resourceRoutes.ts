@@ -46,7 +46,7 @@ router.get("/", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findAl
  *         name: topicId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Successful operation
@@ -66,7 +66,7 @@ router.get("/topic/:topicId", authMiddleware(["Admin", "Editor", "Viewer"]), con
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Successful operation
@@ -88,7 +88,7 @@ router.get("/:id", authMiddleware(["Admin", "Editor", "Viewer"]), controller.fin
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ResourceCreate'
+ *             $ref: '#/components/schemas/Resource'
  *     responses:
  *       201:
  *         description: Resource created successfully
@@ -110,13 +110,13 @@ router.post("/", authMiddleware(["Admin", "Editor"]), controller.create);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ResourceUpdate'
+ *             $ref: '#/components/schemas/Resource'
  *     responses:
  *       200:
  *         description: Resource updated successfully
@@ -140,7 +140,7 @@ router.put("/:id", authMiddleware(["Admin", "Editor"]), controller.update);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       204:
  *         description: Resource deleted successfully

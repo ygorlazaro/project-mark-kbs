@@ -8,10 +8,8 @@ import { BaseModel } from "../../abstracts/baseModel";
  *     Resource:
  *       type: object
  *       properties:
- *         id:
- *           type: string
  *         topicId:
- *           type: string
+ *           type: integer
  *         url:
  *           type: string
  *         description:
@@ -19,12 +17,6 @@ import { BaseModel } from "../../abstracts/baseModel";
  *         type:
  *           type: string
  *           enum: [video, article, pdf]
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
  *       required:
  *         - topicId
  *         - url
@@ -32,14 +24,14 @@ import { BaseModel } from "../../abstracts/baseModel";
  *         - type
 */
 export class ResourceModel extends BaseModel {
-    topicId: string = "";
+    topicId: number = 0;
     url: string = "";
     description: string ="";
     type: "video" | "article" | "pdf" = "article";
 }
 
 export const ResourceSchema = z.object({
-    topicId: z.string(),
+    topicId: z.number(),
     url: z.string().url("Invalid URL format"),
     description: z.string(),
     type: z.enum(["video", "article", "pdf"])

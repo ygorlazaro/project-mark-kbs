@@ -47,7 +47,7 @@ describe("UserController", () => {
     it("returns 201 and user for valid input", () => {
       const { req, res, status, json } = mockReqRes();
       const input: Omit<UserModel, "id" | "createdAt" | "updatedAt"> = { name: "Test", email: "test@example.com", role: "Admin" };
-      const user: UserModel = { id: "1", ...input, createdAt: new Date(), updatedAt: new Date() };
+      const user: UserModel = { id: 1, ...input, createdAt: new Date(), updatedAt: new Date() };
 
       req.body = input;
       (service.create as jest.Mock).mockReturnValue(user);
@@ -59,26 +59,36 @@ describe("UserController", () => {
   });
 
   describe("findById", () => {
-    it("returns 404 if not found", () => {
+    it("returns 400 for invalid id format", () => {
       const { req, res, status, json } = mockReqRes();
 
       req.params = { id: "x" };
+      controller.findById(req, res);
+      expect(service.findById).not.toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({ error: "Invalid ID format" });
+    });
+
+    it("returns 404 if not found", () => {
+      const { req, res, status, json } = mockReqRes();
+
+      req.params = { id: "1" };
       (service.findById as jest.Mock).mockReturnValue(undefined);
       controller.findById(req, res);
-      expect(service.findById).toHaveBeenCalledWith("x");
+      expect(service.findById).toHaveBeenCalledWith(1);
       expect(status).toHaveBeenCalledWith(404);
       expect(json).toHaveBeenCalledWith({ error: "User not found" });
     });
 
     it("returns user if found", () => {
-      const { req, res, status, json } = mockReqRes();
-      const user: UserModel = { id: "1", name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
+      const { req, res, json } = mockReqRes();
+      const user: UserModel = { id: 1, name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
 
       req.params = { id: "1" };
       (service.findById as jest.Mock).mockReturnValue(user);
       controller.findById(req, res);
+      expect(service.findById).toHaveBeenCalledWith(1);
       expect(json).toHaveBeenCalledWith(user);
-      expect(status).not.toHaveBeenCalled();
     });
   });
 
@@ -103,9 +113,9 @@ describe("UserController", () => {
       expect(json).toHaveBeenCalledWith({ error: "Invalid email or user not found" });
     });
 
-    it("returns 500 if token signing fails", async () => {
+        it("returns 500 if token signing fails", async () => {
         const { req, res, status, json } = mockReqRes();
-        const user: UserModel = { id: "1", name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
+        const user: UserModel = { id: 1, name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
 
         req.body = { email: "a@b.com" };
         (service.findByEmail as jest.Mock).mockReturnValue(user);
@@ -115,9 +125,9 @@ describe("UserController", () => {
         expect(json).toHaveBeenCalledWith({ error: "Failed to sign token" });
     });
 
-    it("returns 200 with token on success", async () => {
+        it("returns 200 with token on success", async () => {
         const { req, res, json } = mockReqRes();
-        const user: UserModel = { id: "1", name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
+        const user: UserModel = { id: 1, name: "A", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
 
         req.body = { email: "a@b.com" };
         (service.findByEmail as jest.Mock).mockReturnValue(user);
@@ -128,6 +138,17 @@ describe("UserController", () => {
   });
 
   describe("update", () => {
+    it("returns 400 for invalid id format", () => {
+      const { req, res, status, json } = mockReqRes();
+
+      req.params = { id: "x" };
+      req.body = { name: "New Name" };
+      controller.update(req, res);
+      expect(service.update).not.toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({ error: "Invalid ID format" });
+    });
+
     it("returns 400 for invalid input", () => {
         const { req, res, status, json } = mockReqRes();
 
@@ -141,37 +162,48 @@ describe("UserController", () => {
     it("returns 404 if user to update is not found", () => {
         const { req, res, status, json } = mockReqRes();
 
-        req.params = { id: "x" };
+        req.params = { id: "1" };
         req.body = { name: "New Name" };
         (service.update as jest.Mock).mockReturnValue(undefined);
         controller.update(req, res);
-        expect(service.update).toHaveBeenCalledWith("x", { name: "New Name" });
+        expect(service.update).toHaveBeenCalledWith(1, { name: "New Name" });
         expect(status).toHaveBeenCalledWith(404);
         expect(json).toHaveBeenCalledWith({ error: "User not found" });
     });
 
     it("returns 200 with updated user on success", () => {
         const { req, res, json } = mockReqRes();
-        const updatedUser: UserModel = { id: "1", name: "Updated", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
+        const updatedUser: UserModel = { id: 1, name: "Updated", email: "a@b.com", role: "Admin", createdAt: new Date(), updatedAt: new Date() };
 
         req.params = { id: "1" };
         req.body = { name: "Updated" };
         (service.update as jest.Mock).mockReturnValue(updatedUser);
         controller.update(req, res);
+        expect(service.update).toHaveBeenCalledWith(1, { name: "Updated" });
         expect(json).toHaveBeenCalledWith(updatedUser);
     });
   });
 
   describe("delete", () => {
+    it("returns 400 for invalid id format", () => {
+      const { req, res, status, json } = mockReqRes();
+
+      req.params = { id: "x" };
+      controller.delete(req, res);
+      expect(service.delete).not.toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({ error: "Invalid ID format" });
+    });
+
     it("returns 404 if user to delete is not found", () => {
         const { req, res, status, json } = mockReqRes();
 
-        req.params = { id: "x" };
+        req.params = { id: "1" };
         (service.delete as jest.Mock).mockReturnValue(false);
         controller.delete(req, res);
-        expect(service.delete).toHaveBeenCalledWith("x");
+        expect(service.delete).toHaveBeenCalledWith(1);
         expect(status).toHaveBeenCalledWith(404);
-        expect(json).toHaveBeenCalledWith({ error: "User not a found" });
+        expect(json).toHaveBeenCalledWith({ error: "User not found" });
     });
 
     it("returns 204 on success", () => {
@@ -180,6 +212,7 @@ describe("UserController", () => {
         req.params = { id: "1" };
         (service.delete as jest.Mock).mockReturnValue(true);
         controller.delete(req, res);
+        expect(service.delete).toHaveBeenCalledWith(1);
         expect(status).toHaveBeenCalledWith(204);
         expect(send).toHaveBeenCalled();
     });

@@ -8,7 +8,7 @@ export class ResourceRepository extends BaseRepository<ResourceModel> {
     }
 
 
-    findByTopicId(topicId: string): ResourceModel[] {
+    findByTopicId(topicId: number): ResourceModel[] {
         const resources = this.data.read();
 
         return resources.filter(r => r.topicId === topicId);

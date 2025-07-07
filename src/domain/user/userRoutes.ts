@@ -58,7 +58,7 @@ router.post("/signin", controller.signIn);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UserCreate'
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
  *         description: User created successfully
@@ -67,7 +67,7 @@ router.post("/signin", controller.signIn);
  *       403:
  *         description: Forbidden
  */
-router.post("/", authMiddleware(["Admin"]), controller.create);
+router.post("/", controller.create);
 
 /**
  * @swagger
@@ -82,7 +82,7 @@ router.post("/", authMiddleware(["Admin"]), controller.create);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Successful operation
@@ -104,13 +104,13 @@ router.get("/:id", authMiddleware(["Admin", "Editor", "Viewer"]), controller.fin
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UserUpdate'
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -134,7 +134,7 @@ router.put("/:id", authMiddleware(["Admin", "Editor"]), controller.update);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       204:
  *         description: User deleted successfully

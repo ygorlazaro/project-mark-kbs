@@ -1,11 +1,11 @@
-import { Router } from "express";
+import express from "express";
 import { TopicController } from "./topicController";
 import { TopicRepository } from "./topicRepository";
 import { TopicService } from "./topicService";
 import { TopicDataStore } from "./topicDataStore";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 
-const router = Router();
+const router = express.Router();
 
 const dataTopic = new TopicDataStore();
 const topicRepository = new TopicRepository(dataTopic);
@@ -46,12 +46,12 @@ router.get("/", authMiddleware(["Admin", "Editor", "Viewer"]), controller.findAl
  *         name: startId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *       - in: query
  *         name: endId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Successful operation
@@ -73,7 +73,7 @@ router.get("/shortest-path", authMiddleware(["Admin", "Editor", "Viewer"]), cont
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       200:
  *         description: Successful operation
@@ -95,7 +95,7 @@ router.get("/:id", authMiddleware(["Admin", "Editor", "Viewer"]), controller.fin
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TopicCreate'
+ *             $ref: '#/components/schemas/Topic'
  *     responses:
  *       201:
  *         description: Topic created successfully
@@ -117,13 +117,13 @@ router.post("/", authMiddleware(["Admin", "Editor"]), controller.create);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TopicUpdate'
+ *             $ref: '#/components/schemas/Topic'
  *     responses:
  *       200:
  *         description: Topic updated successfully
@@ -147,7 +147,7 @@ router.put("/:id", authMiddleware(["Admin", "Editor"]), controller.update);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *     responses:
  *       204:
  *         description: Topic deleted successfully
